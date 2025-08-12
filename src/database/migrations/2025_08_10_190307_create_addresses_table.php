@@ -16,7 +16,6 @@ class CreateAddressesTable extends Migration
             $t->string('postal_code', 20);
             $t->string('building', 100)->nullable();
             $t->timestamps();
-
             $t->index('user_id');
             $t->index('purchase_id');
         });
