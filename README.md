@@ -1,1 +1,36 @@
-# ec-site
+<h1>ECサイト</h1>
+
+
+<h2>環境構築</h2>
+
+## Dockerビルド
+<ul>
+　<li>1.origin  git@github.com:Kotaro-905/form-test.git</li>
+  <li>2.ug docker-compose up -d --build</li>
+  </ul>
+
+※MySQLは、OSによって起動しない場合があるのでそれぞれのPCに合わせてdocker-compose.ymlファイルを編集してください
+
+## Laravel環境構築
+<ul>
+　<li>1．docker-compose exec php bash</li>
+　<li>2.composer install</li>
+　<li>3..env.exampleファイルからenvを作成し、環境変数を変更</li>
+　<li>4.php artisan key:generate</li>
+　<li>5.php artisan migrate</li>
+　<li>6.php artisan db:seed</li>
+</ul>
+
+## 使用技術
+<ul>
+ <li>PHP 7.4.9</li>
+ <li>Laravel 8.83.29</li>
+ <li>MySQL　9.3.0</li>
+  <li>Docker（開発環境</li>
+  <li>Laravel Fortify（認証機能</li>
+  <li>HTML/CSS（クラスベースのスタイリング</li>
+</ul>
+
+## URL
+・開発環境（お問い合わせフォーム）：http://localhost/
+・phpMyAdmin：http://localhost:8080/index.php?route=/database/structure&db=information_schema
