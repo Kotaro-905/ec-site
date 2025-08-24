@@ -154,6 +154,9 @@ return [
             'confirm' => true,
             'confirmPassword' => true,
             // 'window' => 0,
+
+            Laravel\Fortify\Features::registration(),
+            Laravel\Fortify\Features::resetPasswords(),
         ]),
     ],
 

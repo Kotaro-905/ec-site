@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class User extends Authenticatable
 {
@@ -21,6 +22,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'image',
     ];
 
     /**
@@ -42,25 +44,30 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
-    
+
 
     // 出品した商品
-    public function items()
-    {
-        return $this->hasMany(Item::class);
-    }
-
-    // 購入（注文）
-    public function purchases()
-    {
-        return $this->hasMany(Purchase::class);
-    }
-
-    // 登録住所（プロフィール住所や購入時に保存した住所）
-    public function addresses()
+    public function addresses(): HasMany
     {
         return $this->hasMany(Address::class);
     }
 
+    // 購入（order_items）
+    public function orderItems(): HasMany
+    {
+        return $this->hasMany(OrderItem::class);
+    }
+
+    // コメント
+    public function comments(): HasMany
+    {
+        return $this->hasMany(Comment::class);
+    }
+
+    // いいね
+    public function likes(): HasMany
+    {
+        return $this->hasMany(Like::class);
+    }
 
 }

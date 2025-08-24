@@ -4,59 +4,61 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\{
+    BelongsTo,
+    BelongsToMany,
+    HasMany
+};
 
 class Item extends Model
 {
-    // status と condition は tinyInteger
+    use HasFactory;
+
     protected $fillable = [
-        'user_id',
-        'category_id',
+        'category_id', 
         'name',
-        'brand',
         'description',
         'price',
         'image',
-        'condition',
+        'brand',
         'status',
+        'condition',
     ];
 
     protected $casts = [
         'price'     => 'integer',
-        'condition' => 'integer',
         'status'    => 'integer',
+        'condition' => 'integer',
     ];
 
-    // 出品者
-    public function user()
-    {
-        return $this->belongsTo(User::class);
-    }
-
-    // カテゴリ
-    public function category()
+    // 主カテゴリ（items.category_id）
+    public function category(): BelongsTo
     {
         return $this->belongsTo(Category::class);
     }
 
-    // 購入（この商品に紐づく注文）
-    public function purchases()
+    // 複数カテゴリ（中間表 item_categories）
+    public function categories(): BelongsToMany
     {
-        return $this->hasMany(Purchase::class);
+        return $this->belongsToMany(Category::class, 'item_categories')
+            ->withTimestamps();
     }
 
-    // 便利スコープ
-    public function scopeOwnedBy($q, int $userId)
+    // コメント
+    public function comments(): HasMany
     {
-        return $q->where('user_id', $userId);
+        return $this->hasMany(Comment::class);
     }
 
-    public function scopePublished($q) // 1=公開
+    // いいね
+    public function likes(): HasMany
     {
-        return $q->where('status', 1);
+        return $this->hasMany(Like::class);
     }
 
-    public function scopeWithCondition($q, int $condition)
+    // 購入明細
+    public function orderItems(): HasMany
     {
-        return $q->where('condition', $condition);
+        return $this->hasMany(OrderItem::class);
     }
 }
