@@ -5,6 +5,7 @@ use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\MyPageController;
+use App\Http\Controllers\ItemController;
 
 
 
@@ -26,4 +27,6 @@ Route::middleware('auth')->group(function () {
    
 });
 
+//商品一覧
+Route::get('/items', [ItemController::class, 'index'])->name('items.index');
 

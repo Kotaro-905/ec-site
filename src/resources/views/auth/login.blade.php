@@ -25,7 +25,7 @@
         <section class="card">
             <h1 class="title">ログイン</h1>
 
-            <form action="{{ route('login') }}" method="post">
+            <form action="{{ route('login') }}" method="post" novalidate>
                 @csrf
 
                 <!-- メールアドレス -->

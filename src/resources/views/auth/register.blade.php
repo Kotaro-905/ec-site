@@ -21,7 +21,7 @@
         <div class="auth__container">
             <h1 class="auth__title">会員登録</h1>
 
-            <form class="form" method="POST" action="{{ route('register') }}">
+            <form class="form" method="POST" action="{{ route('register') }}" novalidate>
                 @csrf
 
                 <div class="form__group">
@@ -29,7 +29,7 @@
                     <input id="name" type="text" name="name" class="form__input"
                         value="{{ old('name') }}" required>
                     @error('name')
-                     <p class="form__error">{{ $message }}</p>
+                    <p class="form__error">{{ $message }}</p>
                     @enderror
                 </div>
 
@@ -37,8 +37,8 @@
                     <label for="email" class="form__label">メールアドレス</label>
                     <input id="email" type="email" name="email" class="form__input"
                         value="{{ old('email') }}" required>
-                    @error('email') 
-                    <p class="form__error">{{ $message }}</p> 
+                    @error('email')
+                    <p class="form__error">{{ $message }}</p>
                     @enderror
                 </div>
 
@@ -46,8 +46,8 @@
                     <label for="password" class="form__label">パスワード</label>
                     <input id="password" type="password" name="password" class="form__input"
                         required>
-                    @error('password') 
-                    <p class="form__error">{{ $message }}</p> 
+                    @error('password')
+                    <p class="form__error">{{ $message }}</p>
                     @enderror
                 </div>
 
@@ -55,7 +55,7 @@
                     <label for="password_confirmation" class="form__label">確認用パスワード</label>
                     <input id="password_confirmation" type="password" name="password_confirmation"
                         class="form__input" required>
-                    @error('password_confirmation') 
+                    @error('password_confirmation')
                     <p class="form__error">{{ $message }}</p>
                     @enderror
                 </div>
