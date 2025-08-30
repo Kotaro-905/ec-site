@@ -13,6 +13,6 @@ class CustomLoginResponse implements LoginResponseContract
             return redirect()->route('profile.setup');
         }
 
-        return redirect()->intended(\App\Providers\RouteServiceProvider::HOME);
+        return redirect()->intended(route('items.index'));
     }
 }

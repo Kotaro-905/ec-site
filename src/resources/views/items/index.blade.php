@@ -22,7 +22,7 @@
     <div class="items__grid">
         @forelse($items as $item)
         <article class="item">
-            <a href="#" class="item__link" aria-disabled="true">
+            <a href="{{ route('items.show', $item) }}" class="item__link" aria-disabled="true">
                 {{-- サムネイル：正方形ラッパー --}}
                 <div class="item__thumb">
                     @if($item->image)

@@ -6,7 +6,7 @@
 <section class="card card--wide" aria-labelledby="profile-title">
     <h1 id="profile-title" class="title">プロフィール設定</h1>
 
-    <form class="form form--profile"  method="post" enctype="multipart/form-data" novalidate>
+    <form class="form form--profile" action="{{ route('profile.update') }}" method="post" enctype="multipart/form-data">
         @csrf
         @method('PUT')
 
@@ -21,9 +21,6 @@
                 画像を選択する
                 <input type="file" name="image" accept="image/*" class="sr-only">
             </label>
-            @error('image')
-            <p class="error">{{ $message }}</p>
-            @enderror
         </div>
 
         <!-- User name -->
@@ -31,20 +28,13 @@
             <label class="label" for="name">ユーザー名</label>
             <input class="input" id="name" name="name" type="text"
                 value="{{ old('name', auth()->user()->name ?? '') }}">
-            @error('name')
-            <p class="error">{{ $message }}</p>
-            @enderror
         </div>
 
         <!-- Postal code -->
         <div class="field">
             <label class="label" for="postal_code">郵便番号</label>
             <input class="input" id="postal_code" name="postal_code" type="text"
-                inputmode="numeric" pattern="[0-9\-]*"
                 value="{{ old('postal_code', $address->postal_code ?? '') }}">
-            @error('postal_code')
-            <p class="error">{{ $message }}</p>
-            @enderror
         </div>
 
         <!-- Address -->
@@ -52,9 +42,6 @@
             <label class="label" for="address">住所</label>
             <input class="input" id="address" name="address" type="text"
                 value="{{ old('address', $address->address ?? '') }}">
-            @error('address')
-            <p class="error">{{ $message }}</p>
-            @enderror
         </div>
 
         <!-- Building -->
@@ -62,9 +49,6 @@
             <label class="label" for="building">建物名</label>
             <input class="input" id="building" name="building" type="text"
                 value="{{ old('building', $address->building ?? '') }}">
-            @error('building')
-            <p class="error">{{ $message }}</p>
-            @enderror
         </div>
 
         <div class="actions">

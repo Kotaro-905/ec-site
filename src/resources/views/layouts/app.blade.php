@@ -7,6 +7,7 @@
     <title>@yield('title', 'COACHTECH')</title>
     <link rel="stylesheet" href="{{ asset('css/app.css') }}">
     <link rel="stylesheet" href="{{ asset('css/sanitize.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/items-show.css') }}">
     @yield('css')
 </head>
 
@@ -19,8 +20,12 @@
                     <img src="{{ asset('logo.svg') }}" alt="COACHTECH" class="header__logo-img">
                 </a>
 
-                <form class="header__search" action="{{ url('/search') }}" method="get" role="search">
-                    <input class="header__search-input" type="search" name="q" placeholder="なにをお探しですか？" aria-label="検索">
+                <form class="header__search" action="{{ route('items.search') }}" method="get" role="search">
+                    <input class="header__search-input"
+                        type="search"
+                        name="q"
+                        placeholder="なにをお探しですか？"
+                        value="{{ request('q') }}">
                 </form>
 
                 <nav class="header__nav">

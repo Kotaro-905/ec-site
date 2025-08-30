@@ -8,6 +8,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class User extends Authenticatable
 {
@@ -47,9 +48,9 @@ class User extends Authenticatable
 
 
     // 出品した商品
-    public function addresses(): HasMany
+    public function address(): HasOne
     {
-        return $this->hasMany(Address::class);
+        return $this->hasOne(Address::class);
     }
 
     // 購入（order_items）

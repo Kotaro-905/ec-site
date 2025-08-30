@@ -25,6 +25,6 @@ class LoginController extends Controller
         }
 
         $request->session()->regenerate();
-        return redirect()->intended('/'); // 目的地 or ホームへ
+        return redirect()->intended(route('items.index'));
     }
 }
