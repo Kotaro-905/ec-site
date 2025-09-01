@@ -27,6 +27,9 @@ Route::middleware('auth')->group(function () {
     Route::post('/items/{item}/like', [ItemController::class, 'toggleLike'])->name('items.like');
     Route::post('/items/{item}/comments', [ItemController::class, 'storeComment'])
         ->name('items.comments.store');
+        
+    Route::get('/items/create', [ItemController::class, 'create'])->name('items.create');
+    Route::post('/items',        [ItemController::class, 'store'])->name('items.store');
     
 });
 

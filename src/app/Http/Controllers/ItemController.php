@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Item;
+use App\Models\Category;
 use App\Models\Comment;
 use Illuminate\Http\Request;
 
@@ -87,6 +88,63 @@ class ItemController extends Controller
 
         return back();
     }
+
+
+    //出品
+
+    public function create()
+    {
+        // 画面のチップに使います
+        $categories = Category::orderBy('name')->get();
+
+        
+        $conditions = [
+            1 => '新品',
+            2 => '未使用に近い',
+            3 => '目立った傷や汚れなし',
+            4 => 'やや傷や汚れあり',
+            5 => '傷や汚れあり',
+        ];
+
+        return view('items.create', compact('categories', 'conditions'));
+    }
+
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'image'       => ['nullable', 'image', 'max:4096'],    
+            'name'        => ['required', 'string', 'max:100'],
+            'brand'       => ['nullable', 'string', 'max:100'],
+            'description' => ['nullable', 'string', 'max:2000'],
+            'price'       => ['required', 'integer', 'min:1', 'max:99999999'],
+            'condition'   => ['required', 'integer', 'between:1,5'],
+            'categories'  => ['nullable', 'array'],
+            'categories.*' => ['integer', 'exists:categories,id'],
+        ]);
+
+        $item = new Item();
+        $item->user_id    = $request->user()->id;
+        $item->name       = $validated['name'];
+        $item->brand      = $validated['brand'] ?? null;
+        $item->description = $validated['description'] ?? null;
+        $item->price      = $validated['price'];
+        $item->condition  = $validated['condition'];
+
+        if ($request->hasFile('image')) {
+            $path = $request->file('image')->store('items', 'public');
+            $item->image = $path;
+        }
+
+        $item->save();
+
+        if (!empty($validated['categories'])) {
+            // 多対多（items ↔ categories）の前提
+            $item->categories()->sync($validated['categories']);
+        }
+
+        return redirect()->route('items.show', $item)->with('status', '出品しました。');
+    }
 }
+
 
 

@@ -16,7 +16,7 @@
     <header class="header">
         <div class="header__bar">
             <div class="header__inner">
-                <a href="{{ url('/') }}" class="header__logo">
+                <a href="{{ route('items.index') }}" class="header__logo">
                     <img src="{{ asset('logo.svg') }}" alt="COACHTECH" class="header__logo-img">
                 </a>
 
