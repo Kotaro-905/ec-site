@@ -10,6 +10,26 @@ use Illuminate\Database\Eloquent\Relations\{
     HasMany
 };
 
+/**
+ * @property int $id
+ * @property int $user_id
+ * @property int $category_id
+ * @property string $name
+ * @property string|null $description
+ * @property int $price
+ * @property string|null $image
+ * @property string|null $brand
+ * @property int $status
+ * @property int $condition
+ *
+ * @property-read Category $category
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, Category> $categories
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, Comment> $comments
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, Like> $likes
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, OrderItem> $orderItems
+ * @property-read string $condition_label
+ */
+
 class Item extends Model
 {
     use HasFactory;

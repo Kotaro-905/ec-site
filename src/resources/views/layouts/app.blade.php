@@ -39,12 +39,12 @@
                         @csrf
                     </form>
 
-                    <!-- ダミーリンク（あとで修正予定） -->
+
                     <a class="header__link" href="#">マイページ</a>
-                    <a class="header__button" href="#">出品</a>
+                    <a class="header__button" href="{{ route('items.create') }}">出品</a>
                     @else
-                    <a class="header__link" href="#">ログイン</a>
-                    <a class="header__link" href="#">会員登録</a>
+                    <a class="header__link" href="{{ route('auth.login') }}">ログイン</a>
+                    <a class="header__link" href="{{ route('auth.register') }}">会員登録</a>
                     @endauth
                 </nav>
             </div>

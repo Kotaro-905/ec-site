@@ -30,6 +30,7 @@ Route::middleware('auth')->group(function () {
         
     Route::get('/items/create', [ItemController::class, 'create'])->name('items.create');
     Route::post('/items',        [ItemController::class, 'store'])->name('items.store');
+    Route::get('/profile', [ProfileController::class, 'show'])->name('profile.show');
     
 });
 

@@ -10,6 +10,22 @@ use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
+/**
+ * @property int $id
+ * @property string $name
+ * @property string $email
+ * @property string $password
+ * @property string|null $image
+ * @property \Illuminate\Support\Carbon|null $email_verified_at
+ * @property string|null $remember_token
+ *
+ * @property-read Address $address
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, Item> $items
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, Comment> $comments
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, Like> $likes
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, OrderItem> $orderItems
+ */
+
 class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable;
@@ -48,9 +64,9 @@ class User extends Authenticatable
 
 
     // 出品した商品
-    public function address(): HasOne
+    public function items(): HasMany
     {
-        return $this->hasOne(Address::class);
+        return $this->hasMany(Item::class);
     }
 
     // 購入（order_items）
