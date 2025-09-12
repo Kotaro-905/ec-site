@@ -87,4 +87,12 @@ class User extends Authenticatable
         return $this->hasMany(Like::class);
     }
 
+    public function address(): HasOne
+    {
+       
+        return $this->hasOne(Address::class);
+        
+    }
+
+
 }

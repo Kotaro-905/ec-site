@@ -6,6 +6,7 @@ use App\Models\Item;
 use App\Models\Category;
 use App\Models\Comment;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 
 class ItemController extends Controller
 {
@@ -112,39 +113,38 @@ class ItemController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'image'       => ['nullable', 'image', 'max:4096'],    
-            'name'        => ['required', 'string', 'max:100'],
-            'brand'       => ['nullable', 'string', 'max:100'],
-            'description' => ['nullable', 'string', 'max:2000'],
-            'price'       => ['required', 'integer', 'min:1', 'max:99999999'],
-            'condition'   => ['required', 'integer', 'between:1,5'],
-            'categories'  => ['nullable', 'array'],
-            'categories.*' => ['integer', 'exists:categories,id'],
+            'image'        => ['nullable', 'image', 'max:4096'],
+            'name'         => ['required', 'string', 'max:100'],
+            'brand'        => ['nullable', 'string', 'max:100'],
+            'description'  => ['nullable', 'string', 'max:2000'],
+            'price'        => ['required', 'integer', 'min:1', 'max:99999999'],
+            'condition'    => ['required', 'integer', 'between:1,5'],
+            'category_id'  => ['nullable', 'integer', 'exists:categories,id'],
         ]);
 
         $item = new Item();
-        $item->user_id    = $request->user()->id;
-        $item->name       = $validated['name'];
-        $item->brand      = $validated['brand'] ?? null;
+        $item->name        = $validated['name'];
+        $item->brand       = $validated['brand'] ?? null;
         $item->description = $validated['description'] ?? null;
-        $item->price      = $validated['price'];
-        $item->condition  = $validated['condition'];
+        $item->price       = $validated['price'];
+        $item->condition   = $validated['condition'];
+        $item->category_id = $validated['category_id'] ?? 1;
+        $item->status = 1;
 
         if ($request->hasFile('image')) {
-            $path = $request->file('image')->store('items', 'public');
-            $item->image = $path;
+            $item->image = $request->file('image')->store('items', 'public');
         }
 
         $item->save();
 
-        if (!empty($validated['categories'])) {
-            // 多対多（items ↔ categories）の前提
-            $item->categories()->sync($validated['categories']);
-        }
+        // ① セッションに「自分が出品したID」を積む（新しいものを先頭へ）
+        $ids = $request->session()->get('my_listed_item_ids', []);
+        array_unshift($ids, (int) $item->id);        // 先頭に追加
+        $ids = array_values(array_unique($ids));     // 重複排除
+        $request->session()->put('my_listed_item_ids', $ids);
 
-        return redirect()->route('items.show', $item)->with('status', '出品しました。');
+        // ② プロフィールへ遷移
+        return redirect()->route('profile.show')->with('status', '出品しました。');
     }
+
 }
-
-
-

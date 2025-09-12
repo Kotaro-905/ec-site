@@ -10,12 +10,14 @@
         @csrf
         @method('PUT')
 
-        <!-- Avatar -->
+        @php
+        $avatarUrl = $user->image ? Storage::url($user->image) : asset('images/avatar-placeholder.png');
+        @endphp
+
         <div class="avatar">
             <div class="avatar__circle">
-                @if(auth()->user()->image ?? false)
-                <img src="{{ auth()->user()->image }}" alt="プロフィール画像">
-                @endif
+                <img src="{{ auth()->user()->image ? asset('storage/' . auth()->user()->image) : asset('images/default-avatar.png') }}"
+                    alt="プロフィール画像">
             </div>
             <label class="avatar__button">
                 画像を選択する
@@ -23,32 +25,28 @@
             </label>
         </div>
 
-        <!-- User name -->
         <div class="field">
             <label class="label" for="name">ユーザー名</label>
             <input class="input" id="name" name="name" type="text"
-                value="{{ old('name', auth()->user()->name ?? '') }}">
+                value="{{ old('name', auth()->user()->name) }}">
         </div>
 
-        <!-- Postal code -->
         <div class="field">
             <label class="label" for="postal_code">郵便番号</label>
             <input class="input" id="postal_code" name="postal_code" type="text"
-                value="{{ old('postal_code', $address->postal_code ?? '') }}">
+                value="{{ old('postal_code', $user->address->postal_code ?? '') }}">
         </div>
 
-        <!-- Address -->
         <div class="field">
             <label class="label" for="address">住所</label>
             <input class="input" id="address" name="address" type="text"
-                value="{{ old('address', $address->address ?? '') }}">
+                value="{{ old('address', $user->address->address ?? '') }}">
         </div>
 
-        <!-- Building -->
         <div class="field">
             <label class="label" for="building">建物名</label>
             <input class="input" id="building" name="building" type="text"
-                value="{{ old('building', $address->building ?? '') }}">
+                value="{{ old('building', $user->address->building ?? '') }}">
         </div>
 
         <div class="actions">

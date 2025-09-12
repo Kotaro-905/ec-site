@@ -82,6 +82,12 @@ class Item extends Model
         return $this->hasMany(OrderItem::class);
     }
 
+    // 出品者
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
     // 状態ラベル
     public const CONDITION_LABELS = [
         

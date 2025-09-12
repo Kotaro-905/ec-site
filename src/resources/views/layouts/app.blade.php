@@ -40,7 +40,7 @@
                     </form>
 
 
-                    <a class="header__link" href="#">マイページ</a>
+                    <a class="header__link" href="{{ route('profile.show') }}">マイページ</a>
                     <a class="header__button" href="{{ route('items.create') }}">出品</a>
                     @else
                     <a class="header__link" href="{{ route('auth.login') }}">ログイン</a>

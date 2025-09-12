@@ -38,7 +38,7 @@
                 </div>
 
                 {{-- 購入（ダミー） --}}
-                <button class="buy-btn" disabled>購入手続きへ</button>
+                <a class="buy-btn" href="{{ route('purchase.create', $item) }}">購入手続きへ</a>
             </div>
 
             {{-- 商品説明 --}}

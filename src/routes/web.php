@@ -6,6 +6,7 @@ use App\Http\Controllers\LoginController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\MyPageController;
 use App\Http\Controllers\ItemController;
+use App\Http\Controllers\PurchaseController;
 
 
 
@@ -31,6 +32,10 @@ Route::middleware('auth')->group(function () {
     Route::get('/items/create', [ItemController::class, 'create'])->name('items.create');
     Route::post('/items',        [ItemController::class, 'store'])->name('items.store');
     Route::get('/profile', [ProfileController::class, 'show'])->name('profile.show');
+
+    Route::get('/items/{item}/buy',  [PurchaseController::class, 'create'])->name('purchase.create');
+    Route::post('/items/{item}/buy', [PurchaseController::class, 'store'])->name('purchase.store');
+    Route::get('/purchase/complete', [PurchaseController::class, 'complete'])->name('purchase.complete');
     
 });
 
