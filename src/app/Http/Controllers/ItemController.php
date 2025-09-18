@@ -15,21 +15,20 @@ class ItemController extends Controller
         $tab = $request->query('tab', 'recommend'); // recommend | mylist
 
         if ($tab === 'mylist') {
-            // いいね商品（未ログイン時は空）
             $items = auth()->check()
-                ? Item::select('id', 'name', 'image')
+                ? Item::select('id', 'name', 'image', 'status')   // ← ここに status を追加
                 ->whereHas('likes', fn($q) => $q->where('user_id', auth()->id()))
-                ->latest()->paginate(12)
-                : collect(); 
+                ->latest()
+                ->paginate(12)
+                : collect();
         } else {
-            // おすすめ（ダミー：新着順）
-            $items = Item::select('id', 'name', 'image')
-                ->latest()->paginate(12);
+            $items = Item::select('id', 'name', 'image', 'status') // ← ここにも status を追加
+                ->latest()
+                ->paginate(12);
         }
 
         return view('items.index', compact('items', 'tab'));
     }
-
 
     public function search(Request $request)
     {

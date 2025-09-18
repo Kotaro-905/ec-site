@@ -77,28 +77,35 @@ class ProfileController extends Controller
     /** プロフィール表示（出品リストはセッションのID順で） */
     public function show(Request $request)
     {
-        // 画面の表示に使う最新ユーザー（住所も取得）
         $user = $request->user()->fresh()->load('address');
 
-        // セッションから出品IDを取り出し（重複除去・int化）
-        $ids = array_values(array_unique(array_map(
+        // セッションから出品ID
+        $listedIds = array_values(array_unique(array_map(
             'intval',
             $request->session()->get('my_listed_item_ids', [])
         )));
+        $listedItems = empty($listedIds)
+            ? collect()
+            : \App\Models\Item::whereIn('id', $listedIds)
+            ->orderByRaw('FIELD(id,' . implode(',', $listedIds) . ')')
+            ->get();
 
-        if (empty($ids)) {
-            $items = collect(); // まだ出品なし
-        } else {
-            // セッション順に表示
-            $idsList = implode(',', $ids);
-            $items = Item::whereIn('id', $ids)
-                ->orderByRaw("FIELD(id, $idsList)")
-                ->get();
-        }
+        // セッションから購入ID
+        $purchasedIds = array_values(array_unique(array_map(
+            'intval',
+            $request->session()->get('my_purchased_item_ids', [])
+        )));
+        $purchasedItems = empty($purchasedIds)
+            ? collect()
+            : \App\Models\Item::whereIn('id', $purchasedIds)
+            ->orderByRaw('FIELD(id,' . implode(',', $purchasedIds) . ')')
+            ->get();
 
         return view('profile.show', [
-            'user'  => $user,
-            'items' => $items,
+            'user'            => $user,
+            'listedItems'     => $listedItems,
+            'purchasedItems'  => $purchasedItems,
+            'tab'             => $request->query('tab', 'listed'), // デフォは出品した商品
         ]);
     }
 }

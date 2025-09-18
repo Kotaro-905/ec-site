@@ -139,3 +139,27 @@
         font-size: 13px;
     }
 }
+
+/* SOLD リボン用 */
+.item__thumb--wrap {
+    position: relative;
+}
+
+/* リボンを重ねるための相対配置 */
+
+.item__sold {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    background: rgba(255, 0, 0, 0.8);
+    color: #fff;
+    font-weight: bold;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 12px;
+}
+
+.item__thumb {
+    position: relative;
+    /* ← SOLDバッジ表示のため */
+}

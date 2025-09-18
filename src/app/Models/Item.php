@@ -101,4 +101,27 @@ class Item extends Model
     {
         return self::CONDITION_LABELS[$this->condition] ?? '-';
     }
+
+
+    public const STATUS_ONSALE = 1;  // 出品中
+    public const STATUS_SOLD   = 2;  // 売り切れ
+
+    
+
+    // モデル生成時のデフォルト値（マイグレーションを触らずに「出品中」を既定にしたいとき）
+    protected $attributes = [
+        'status' => self::STATUS_ONSALE,
+    ];
+
+    // 売り切れかどうか
+    public function getIsSoldAttribute(): bool
+    {
+        return (int) $this->status === self::STATUS_SOLD;
+    }
+
+    // 出品中だけを取りたいとき
+    public function scopeOnSale($query)
+    {
+        return $query->where('status', self::STATUS_ONSALE);
+    }
 }

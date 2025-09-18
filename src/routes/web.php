@@ -35,8 +35,22 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/items/{item}/buy',  [PurchaseController::class, 'create'])->name('purchase.create');
     Route::post('/items/{item}/buy', [PurchaseController::class, 'store'])->name('purchase.store');
-    Route::get('/purchase/complete', [PurchaseController::class, 'complete'])->name('purchase.complete');
+
+    Route::get('/purchase/success', [PurchaseController::class, 'success'])->name('purchase.success');
+    Route::get('/purchase/cancel',  [PurchaseController::class, 'cancel'])->name('purchase.cancel');
+
     
+    Route::post('/purchase/checkout/{item}', [PurchaseController::class, 'checkout'])
+        ->where('item', '[0-9]+')
+        ->name('purchase.checkout');
+
+    Route::get('/purchase/{item}', [PurchaseController::class, 'create'])
+        ->where('item', '[0-9]+')
+        ->name('purchase.create');
+
+    Route::get('/purchase/{item}/address',  [PurchaseController::class, 'editAddress'])->name('purchase.address.edit');
+    Route::put('/purchase/{item}/address',  [PurchaseController::class, 'updateAddress'])->name('purchase.address.update');
+
 });
 
 //商品一覧

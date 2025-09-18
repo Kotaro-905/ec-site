@@ -21,16 +21,23 @@
 
     <div class="items__grid">
         @forelse($items as $item)
-        <article class="item">
+        {{-- SOLD のときにクラスを付けておくと見た目調整が楽です --}}
+        <article class="item {{ (int)$item->status === 2 ? 'is-sold' : '' }}">
             <a href="{{ route('items.show', $item) }}" class="item__link">
-                {{-- サムネイル：正方形ラッパー --}}
-                <div class="item__thumb">
+                {{-- サムネイル（相対配置にしてリボンを重ねる） --}}
+                <div class="item__thumb item__thumb--wrap">
                     @if($item->image)
                     <img src="{{ asset('storage/'.$item->image) }}" alt="{{ $item->name }}">
                     @else
                     <div class="item__thumb--ph">商品画像</div>
                     @endif
+
+                    {{-- SOLD リボン --}}
+                    @if((int)$item->status === 2) {{-- ← SOLD の値に合わせて変更 --}}
+                    <span class="item__sold">SOLD</span>
+                    @endif
                 </div>
+
                 <h3 class="item__name">{{ $item->name }}</h3>
             </a>
         </article>

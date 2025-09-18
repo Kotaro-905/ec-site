@@ -8,92 +8,147 @@
 
 @section('content')
 <div class="purchase">
+    <div class="purchase__container">
 
-    {{-- 左：詳細エリア --}}
-    <section class="purchase__main">
-        <div class="itemline">
-            <div class="itemline__thumb">
-                @if($item->image)
-                <img src="{{ asset('storage/'.$item->image) }}" alt="{{ $item->name }}">
-                @else
-                <div class="ph">商品画像</div>
-                @endif
-            </div>
-            <div class="itemline__meta">
-                <h1 class="itemline__title">{{ $item->name }}</h1>
-                <div class="itemline__price">¥{{ number_format($item->price) }}</div>
-            </div>
-        </div>
+        {{-- 左カラム：商品詳細 + 支払い方法 + 配送先 --}}
+        <div class="purchase__main">
 
-        <hr class="sep">
-
-        {{-- 支払い方法 --}}
-        <div class="block">
-            <h2 class="block__title">支払い方法</h2>
-            <div class="field">
-                <select name="payment_method" class="select" id="payment-method">
-                    <option value="" selected disabled>選択してください</option>
-                    <option value="card">クレジットカード</option>
-                    <option value="konbini">コンビニ払い</option>
-                    <option value="bank">銀行振込</option>
-                </select>
-            </div>
-        </div>
-
-        <hr class="sep">
-
-        {{-- 配送先 --}}
-        <div class="block">
-            <h2 class="block__title">配送先</h2>
-            <div class="address">
-                @php
-                $zip = $address?->postal_code ? '〒 '.chunk_split($address->postal_code, 3, '-') : '未設定';
-                $addr = trim(($address->address ?? '').' '.($address->building ?? ''));
-                @endphp
-                <div class="address__text">
-                    <div class="address__zip">{{ $zip }}</div>
-                    <div class="address__body">{{ $addr ?: 'ここには住所と建物が入ります' }}</div>
+            {{-- ヘッダーブロック（商品画像・商品名・価格） --}}
+            <section class="purchase-head">
+                <div class="purchase-head__thumb">
+                    @if($item->image)
+                    <img src="{{ asset('storage/'.$item->image) }}" alt="{{ $item->name }}">
+                    @else
+                    <div class="purchase-head__ph">商品画像</div>
+                    @endif
                 </div>
-                <a class="address__edit" href="{{ route('profile.edit') }}">変更する</a>
-            </div>
+                <div class="purchase-head__meta">
+                    <h1 class="purchase-head__name">{{ $item->name }}</h1>
+                    <p class="purchase-head__price">¥{{ number_format($item->price) }}</p>
+                </div>
+            </section>
+
+            <hr class="purchase__divider">
+
+            {{-- 支払い方法（select） --}}
+            <section class="purchase-block">
+                <h2 class="purchase-block__title">支払い方法</h2>
+
+                <form id="purchaseForm" class="purchase-form"
+                    action="{{ route('purchase.checkout', $item) }}"
+                    method="POST">
+                    @csrf
+
+                    <div class="purchase-form__row">
+                        <div class="select-wrap">
+                            <select name="payment_method" id="paymentMethod" class="select">
+                                <option value="" selected disabled>選択してください</option>
+                                <option value="konbini">コンビニ払い</option>
+                                <option value="card">カード支払い</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    {{-- 配送先 --}}
+                    <div class="purchase__divider purchase__divider--thin"></div>
+
+                    <h2 class="purchase-block__title">配送先</h2>
+                    <div class="address">
+                        @if($address)
+                        <p class="address__line">〒 {{ $address->postal_code }}</p>
+                        <p class="address__line">{{ $address->address }} {{ $address->building }}</p>
+                        @else
+                        <p class="address__line -muted">配送先が未登録です。プロフィールから登録してください。</p>
+                        @endif
+
+                        <a href="{{ route('profile.edit') }}" class="address__edit">変更する</a>
+                    </div>
+
+                    {{-- 右カラムの購入ボタンと同じ動作にするため hidden submit は置かない --}}
+                </form>
+            </section>
+
+            <div class="purchase__bottom-space"></div>
         </div>
 
-        {{-- モバイル用ボタン --}}
-        <button class="buybtn buybtn--mobile" type="button" onclick="alert('ダミー処理です');">購入する</button>
-    </section>
+        {{-- 右カラム：金額サマリ + 支払い方法表示 + 購入ボタン --}}
+        <aside class="purchase__side">
+            <div class="summary-card">
 
-    {{-- 右：サマリーカード --}}
-    <aside class="purchase__summary">
-        <div class="summary">
-            <div class="summary__row">
-                <div class="summary__label">商品代金</div>
-                <div class="summary__value">¥{{ number_format($item->price) }}</div>
-            </div>
-            <div class="summary__row">
-                <div class="summary__label">支払い方法</div>
-                <div class="summary__badge" id="summary-method">未選択</div>
+                <div class="summary-card__row">
+                    <span class="summary-card__label">商品代金</span>
+                    <span class="summary-card__value">¥{{ number_format($item->price) }}</span>
+                </div>
+
+                <div class="summary-card__row">
+                    <span class="summary-card__label">支払い方法</span>
+                    <span id="methodLabel" class="summary-card__value -muted">未選択</span>
+                </div>
+
             </div>
 
-            {{-- ダミー処理 --}}
-            <button class="buybtn" type="button" onclick="alert('ダミー処理です');">購入する</button>
-        </div>
-    </aside>
+            <button id="buyButton" class="purchase-button" disabled>
+                購入する
+            </button>
+
+            {{-- バリデーション／フラッシュ --}}
+            @if ($errors->any())
+            <div class="purchase-alert -error">
+                <ul>
+                    @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+            @endif
+
+            @if (session('error'))
+            <div class="purchase-alert -error">{{ session('error') }}</div>
+            @endif
+            @if (session('status'))
+            <div class="purchase-alert -ok">{{ session('status') }}</div>
+            @endif
+        </aside>
+
+    </div>
 </div>
-
-<script>
-    document.addEventListener('DOMContentLoaded', () => {
-        const sel = document.getElementById('payment-method');
-        const label = document.getElementById('summary-method');
-        const text = {
-            card: 'クレジットカード',
-            konbini: 'コンビニ払い',
-            bank: '銀行振込'
-        };
-        if (sel) {
-            sel.addEventListener('change', () => {
-                label.textContent = text[sel.value] ?? '未選択';
-            });
-        }
-    });
-</script>
 @endsection
+
+@push('scripts')
+<script>
+    (function() {
+        const methodSelect = document.getElementById('paymentMethod');
+        const methodLabel = document.getElementById('methodLabel');
+        const buyButton = document.getElementById('buyButton');
+        const form = document.getElementById('purchaseForm');
+
+        const labelMap = {
+            konbini: 'コンビニ払い',
+            card: 'カード支払い'
+        };
+
+        function updateUI() {
+            const val = methodSelect.value;
+            if (val && labelMap[val]) {
+                methodLabel.textContent = labelMap[val];
+                methodLabel.classList.remove('-muted');
+                buyButton.disabled = false;
+            } else {
+                methodLabel.textContent = '未選択';
+                methodLabel.classList.add('-muted');
+                buyButton.disabled = true;
+            }
+        }
+
+        methodSelect.addEventListener('change', updateUI);
+        updateUI();
+
+        // 右カラムの「購入する」ボタンでフォーム送信
+        buyButton.addEventListener('click', function() {
+            // 選択されていなければ送信しない（ガード）
+            if (!methodSelect.value) return;
+            form.submit();
+        });
+    })();
+</script>
+@endpush
