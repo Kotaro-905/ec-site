@@ -3,10 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Models\Item;
+use Illuminate\Support\Facades\DB;
 use App\Models\Address;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Stripe\StripeClient;
+use App\Models\OrderItem;
+
 
 class PurchaseController extends Controller
 {
@@ -77,46 +79,51 @@ class PurchaseController extends Controller
     }
 
     /** 成功遷移（webhook なしで SOLD 反映 & セッションへ追加） */
-    public function success(Request $request)
+       public function success(Request $request)
     {
         $sessionId = $request->query('session_id');
         if (!$sessionId) {
-            return redirect()->route('items.index')
-                ->with('error', '決済セッションが見つかりませんでした。');
-        }
+        return redirect()->route('items.index')->with('error', '決済セッションが見つかりませんでした。');
+       }
 
-        $stripe = new StripeClient(config('services.stripe.secret'));
+        $stripe = new \Stripe\StripeClient(config('services.stripe.secret'));
 
         try {
-            $session = $stripe->checkout->sessions->retrieve($sessionId, []);
+        $session = $stripe->checkout->sessions->retrieve($sessionId, []);
         } catch (\Throwable $e) {
-            return redirect()->route('items.index')
-                ->with('error', '決済情報の取得に失敗しました。');
+           return redirect()->route('items.index')->with('error', '決済情報の取得に失敗しました。');
         }
 
-        $itemId = (int) ($session->metadata->item_id ?? 0);
-        if (!$itemId) {
-            return redirect()->route('items.index')
-                ->with('error', '対象商品が特定できませんでした。');
+       $itemId = (int) ($session->metadata->item_id ?? 0);
+     $method = $session->payment_method_types[0] ?? ($session->metadata->method ?? 'card');
+       if (!$itemId) {
+        return redirect()->route('items.index')->with('error', '対象商品が特定できませんでした。');
         }
 
-        // 1) SOLD にする
-        $item = Item::find($itemId);
+         DB::transaction(function () use ($request, $itemId, $method) {
+        // 1) SOLD にする（2 = SOLD）
+        $item = Item::lockForUpdate()->find($itemId);
         if ($item && (int)$item->status !== 2) {
-            $item->status = 2; // ← SOLD の値
+            $item->status = 2;
             $item->save();
         }
 
-        // 2) 「購入した商品」ID をセッションに積む（重複除去しつつ先頭に）
-        $purchased = $request->session()->get('my_purchased_item_ids', []);
-        array_unshift($purchased, $itemId);
-        $purchased = array_values(array_unique(array_map('intval', $purchased)));
-        $request->session()->put('my_purchased_item_ids', $purchased);
+        // 2) 購入履歴を保存（同じ item を二重で入れない軽いガード）
+        $exists = OrderItem::where('user_id', $request->user()->id)
+            ->where('item_id', $itemId)
+            ->exists();
 
-        // 3) 一覧へ
+        if (!$exists) {
+            OrderItem::create([
+                'user_id'        => $request->user()->id,
+                'item_id'        => $itemId,
+                'payment_method' => $method === 'konbini' ? 2 : 1,
+              ]);
+           }
+       });
+
         return redirect()->route('items.index')->with('status', '購入処理を完了しました。');
     }
-
     /** キャンセル遷移 */
 
     public function cancel()

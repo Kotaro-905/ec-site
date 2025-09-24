@@ -7,6 +7,7 @@ use App\Models\Item;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use App\Models\User;
+use App\Models\OrderItem;
 
 class ProfileController extends Controller
 {
@@ -48,7 +49,7 @@ class ProfileController extends Controller
                 Storage::disk('public')->delete($user->image);
             }
 
-            // ★DBには相対パス（avatars/xxx.jpg）で保存
+            
             $user->image = $newPath;
         }
 
@@ -76,36 +77,25 @@ class ProfileController extends Controller
 
     /** プロフィール表示（出品リストはセッションのID順で） */
     public function show(Request $request)
-    {
-        $user = $request->user()->fresh()->load('address');
+{
+    $user = $request->user();
 
-        // セッションから出品ID
-        $listedIds = array_values(array_unique(array_map(
-            'intval',
-            $request->session()->get('my_listed_item_ids', [])
-        )));
-        $listedItems = empty($listedIds)
-            ? collect()
-            : \App\Models\Item::whereIn('id', $listedIds)
-            ->orderByRaw('FIELD(id,' . implode(',', $listedIds) . ')')
-            ->get();
+    // 出品した商品（新しい順）
+    $listedItems = Item::where('user_id', $user->id)
+        ->latest()
+        ->get();
 
-        // セッションから購入ID
-        $purchasedIds = array_values(array_unique(array_map(
-            'intval',
-            $request->session()->get('my_purchased_item_ids', [])
-        )));
-        $purchasedItems = empty($purchasedIds)
-            ? collect()
-            : \App\Models\Item::whereIn('id', $purchasedIds)
-            ->orderByRaw('FIELD(id,' . implode(',', $purchasedIds) . ')')
-            ->get();
+    // 購入した商品（order_items 経由で item を一緒に）
+    $purchasedItems = OrderItem::with('item')
+        ->where('user_id', $user->id)
+        ->latest()
+        ->get();
 
-        return view('profile.show', [
-            'user'            => $user,
-            'listedItems'     => $listedItems,
-            'purchasedItems'  => $purchasedItems,
-            'tab'             => $request->query('tab', 'listed'), // デフォは出品した商品
-        ]);
-    }
+    // 既存の Blade に合わせる
+    return view('profile.show', [
+        'listedItems'    => $listedItems,
+        'purchasedItems' => $purchasedItems,
+        
+    ]);
+}
 }

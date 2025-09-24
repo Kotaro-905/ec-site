@@ -13,32 +13,33 @@ class ItemController extends Controller
 {
     public function index(Request $request)
     {
-        $tab = $request->query('tab', 'recommend');
-        $q   = $request->query('q');
+    $tab = $request->query('tab', 'recommend'); // recommend | mylist
 
-        if ($tab === 'mylist') {
-            $items = auth()->check()
-                ? Item::select('id', 'name', 'image', 'status')
-                ->whereHas('likes', fn($q2) => $q2->where('user_id', auth()->id()))
-                ->when($q, fn($qq) => $qq->where('name', 'LIKE', "%{$q}%"))
-                ->latest()->paginate(12)->withQueryString()
-                : collect();
-        } else {
-            $query = Item::select('id', 'name', 'image', 'status')
-                ->when($q, fn($qq) => $qq->where('name', 'LIKE', "%{$q}%"))
-                ->latest();
+    if ($tab === 'mylist') {
+        $items = auth()->check()
+            ? Item::select('id', 'name', 'image', 'status')
+                ->whereHas('likes', fn($q) => $q->where('user_id', auth()->id()))
+                ->latest()
+                ->paginate(12)
+            : collect();
+    } else {
+        $q = Item::select('id', 'name', 'image', 'status');
 
-           
-            if ($request->session()->has('my_listed_item_ids')) {
-                $query->whereNotIn('id', $request->session()->get('my_listed_item_ids', []));
-            }
-
-            $items = $query->paginate(12)->withQueryString();
+        
+        if (auth()->check()) {
+            $userId = auth()->id();
+            $q->where(function ($qq) use ($userId) {
+                $qq->whereNull('user_id')           
+                   ->orWhere('user_id', '!=', $userId); // 自分の出品だけ除外
+            });
         }
+        // 未ログイン時はフィルタ不要
 
-        return view('items.index', compact('items', 'tab'));
+        $items = $q->latest()->paginate(12);
     }
 
+    return view('items.index', compact('items', 'tab'));
+    }
 
     public function search(Request $request)
     {
@@ -115,39 +116,36 @@ class ItemController extends Controller
 
     public function store(Request $request)
     {
-        $validated = $request->validate([
-            'image'        => ['nullable', 'image', 'max:4096'],
-            'name'         => ['required', 'string', 'max:100'],
-            'brand'        => ['nullable', 'string', 'max:100'],
-            'description'  => ['nullable', 'string', 'max:2000'],
-            'price'        => ['required', 'integer', 'min:1', 'max:99999999'],
-            'condition'    => ['required', 'integer', 'between:1,5'],
-            'category_id'  => ['nullable', 'integer', 'exists:categories,id'],
-        ]);
+      $validated = $request->validate([
+        'image'        => ['nullable', 'image', 'max:4096'],
+        'name'         => ['required', 'string', 'max:100'],
+        'brand'        => ['nullable', 'string', 'max:100'],
+        'description'  => ['nullable', 'string', 'max:2000'],
+        'price'        => ['required', 'integer', 'min:1', 'max:99999999'],
+        'condition'    => ['required', 'integer', 'between:1,5'],
+        'category_id'  => ['nullable', 'integer', 'exists:categories,id'],
+      ]);
 
-        $item = new Item();
-        $item->name        = $validated['name'];
-        $item->brand       = $validated['brand'] ?? null;
-        $item->description = $validated['description'] ?? null;
-        $item->price       = $validated['price'];
-        $item->condition   = $validated['condition'];
-        $item->category_id = $validated['category_id'] ?? 1;
-        $item->status = 1;
-
-        if ($request->hasFile('image')) {
-            $item->image = $request->file('image')->store('items', 'public');
-        }
-
-        $item->save();
-
-        // ① セッションに「自分が出品したID」を積む（新しいものを先頭へ）
-        $ids = $request->session()->get('my_listed_item_ids', []);
-        array_unshift($ids, (int) $item->id);        // 先頭に追加
-        $ids = array_values(array_unique($ids));     // 重複排除
-        $request->session()->put('my_listed_item_ids', $ids);
-
-        // ② プロフィールへ遷移
-        return redirect()->route('profile.show')->with('status', '出品しました。');
+      $item = new Item();
+      $item->user_id     = $request->user()->id;              //  出品者IDを保存
+      $item->name        = $validated['name'];
+      $item->brand       = $validated['brand'] ?? null;
+      $item->description = $validated['description'] ?? null;
+      $item->price       = $validated['price'];
+      $item->condition   = $validated['condition'];
+      $item->category_id = $validated['category_id'] ?? 1;
+      $item->status      = 1;                                  // 公開
+      if ($request->hasFile('image')) {
+        $item->image = $request->file('image')->store('items', 'public');
     }
+    $item->save();
 
+    // （旧：セッション積み上げ/ 将来削除）
+    $ids = $request->session()->get('my_listed_item_ids', []);
+    array_unshift($ids, (int) $item->id);
+    $ids = array_values(array_unique($ids));
+    $request->session()->put('my_listed_item_ids', $ids);
+
+    return redirect()->route('profile.show')->with('status', '出品しました。');
+  }
 }
