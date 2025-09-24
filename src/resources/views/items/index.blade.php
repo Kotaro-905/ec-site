@@ -9,9 +9,10 @@
 @section('content')
 <div class="items">
     <div class="items__tabs">
-        <a href="{{ route('items.index', ['tab'=>'recommend']) }}"
+        <a href="{{ route('items.index', ['tab'=>'recommend', 'q'=>request('q')]) }}"
             class="items__tab {{ $tab==='recommend' ? 'is-active' : '' }}">おすすめ</a>
-        <a href="{{ route('items.index', ['tab'=>'mylist']) }}"
+
+        <a href="{{ route('items.index', ['tab'=>'mylist', 'q'=>request('q')]) }}"
             class="items__tab {{ $tab==='mylist' ? 'is-active' : '' }}">マイリスト</a>
     </div>
 

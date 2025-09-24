@@ -8,40 +8,44 @@ use App\Models\Comment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 
+
 class ItemController extends Controller
 {
     public function index(Request $request)
     {
-        $tab = $request->query('tab', 'recommend'); // recommend | mylist
+        $tab = $request->query('tab', 'recommend');
+        $q   = $request->query('q');
 
         if ($tab === 'mylist') {
             $items = auth()->check()
-                ? Item::select('id', 'name', 'image', 'status')   // ← ここに status を追加
-                ->whereHas('likes', fn($q) => $q->where('user_id', auth()->id()))
-                ->latest()
-                ->paginate(12)
+                ? Item::select('id', 'name', 'image', 'status')
+                ->whereHas('likes', fn($q2) => $q2->where('user_id', auth()->id()))
+                ->when($q, fn($qq) => $qq->where('name', 'LIKE', "%{$q}%"))
+                ->latest()->paginate(12)->withQueryString()
                 : collect();
         } else {
-            $items = Item::select('id', 'name', 'image', 'status') // ← ここにも status を追加
-                ->latest()
-                ->paginate(12);
+            $query = Item::select('id', 'name', 'image', 'status')
+                ->when($q, fn($qq) => $qq->where('name', 'LIKE', "%{$q}%"))
+                ->latest();
+
+           
+            if ($request->session()->has('my_listed_item_ids')) {
+                $query->whereNotIn('id', $request->session()->get('my_listed_item_ids', []));
+            }
+
+            $items = $query->paginate(12)->withQueryString();
         }
 
         return view('items.index', compact('items', 'tab'));
     }
 
+
     public function search(Request $request)
     {
-        $query = $request->input('q');  // 検索欄の入力値
-
-        $items = Item::query()
-            ->when($query, function ($q) use ($query) {
-                $q->where('name', 'LIKE', "%{$query}%");  // 部分一致
-            })
-            ->paginate(12); // ページネーションも可
-
-        return view('items.index', compact('items'))
-            ->with('tab', 'recommend'); 
+        return redirect()->route('items.index', [
+            'tab' => $request->input('tab', 'recommend'),
+            'q'   => $request->input('q'),
+        ]);
     }
 
 

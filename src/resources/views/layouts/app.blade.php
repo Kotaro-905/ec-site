@@ -26,6 +26,7 @@
                         name="q"
                         placeholder="なにをお探しですか？"
                         value="{{ request('q') }}">
+                    <input type="hidden" name="tab" value="{{ request('tab', 'recommend') }}">
                 </form>
 
                 <nav class="header__nav">

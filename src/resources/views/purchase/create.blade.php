@@ -61,7 +61,7 @@
                         <p class="address__line -muted">配送先が未登録です。プロフィールから登録してください。</p>
                         @endif
 
-                        <a href="{{ route('profile.edit') }}" class="address__edit">変更する</a>
+                        <a href="{{ route('purchase.address.edit', $item) }}" class="change-link">変更する</a>
                     </div>
 
                     {{-- 右カラムの購入ボタンと同じ動作にするため hidden submit は置かない --}}
