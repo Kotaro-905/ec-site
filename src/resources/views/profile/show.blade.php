@@ -9,7 +9,7 @@
 
 @section('content')
 @php
-    $tab = $tab ?? request('tab', 'listed'); 
+    $tab = $tab ?? request('tab', 'listed');
 @endphp
 
 <div class="profile">
@@ -40,8 +40,9 @@
         <p class="profile__empty">…まだ出品がありません。</p>
       @endforelse
     @else
+     
       @forelse ($purchasedItems as $item)
-        @include('partials.item-card', ['item' => $item])
+          @include('partials.item-card', ['item' => $item])
       @empty
         <p class="profile__empty">…まだ購入履歴がありません。</p>
       @endforelse
@@ -49,3 +50,7 @@
   </div>
 </div>
 @endsection
+
+
+
+

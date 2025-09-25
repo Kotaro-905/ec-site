@@ -7,6 +7,7 @@ use App\Models\Item;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use App\Models\User;
+use Illuminate\Support\Facades\DB; 
 use App\Models\OrderItem;
 
 class ProfileController extends Controller
@@ -76,26 +77,47 @@ class ProfileController extends Controller
     }
 
     /** プロフィール表示（出品リストはセッションのID順で） */
-    public function show(Request $request)
+  public function show(Request $request)
 {
     $user = $request->user();
+    $tab  = $request->query('tab', 'listed');
 
-    // 出品した商品（新しい順）
-    $listedItems = Item::where('user_id', $user->id)
-        ->latest()
-        ->get();
+    // 出品した商品（現状のまま）
+    $listedItems = collect();
+    $ids = array_values(array_unique(array_map('intval',
+        $request->session()->get('my_listed_item_ids', [])
+    )));
+    if (!empty($ids)) {
+        $listedItems = Item::whereIn('id', $ids)
+            ->orderByRaw('FIELD(id, '.implode(',', $ids).')')
+            ->get(['id','name','image','price','status']);
+    }
 
-    // 購入した商品（order_items 経由で item を一緒に）
-    $purchasedItems = OrderItem::with('item')
+    // 購入した商品：order_items → items の2段階（配列に確実にしてから検索）
+    $purchasedIds = DB::table('order_items')
         ->where('user_id', $user->id)
-        ->latest()
-        ->get();
+        ->orderByDesc('created_at')
+        ->pluck('item_id')
+        ->map(fn ($v) => (int) $v)   // 数値化
+        ->values();
 
-    // 既存の Blade に合わせる
+    if ($purchasedIds->isNotEmpty()) {
+        $idArray = $purchasedIds->all();            // ← 配列にするのがポイント
+        $csv     = implode(',', $idArray);          // FIELD() 用
+
+        $purchasedItems = Item::query()
+            ->whereIn('id', $idArray)
+            ->when($csv !== '', fn ($q) => $q->orderByRaw("FIELD(id, $csv)"))
+            ->get(['id','name','image','price','status']);
+    } else {
+        $purchasedItems = collect();
+    }
+
     return view('profile.show', [
+        'user'           => $user,
+        'tab'            => $tab,
         'listedItems'    => $listedItems,
         'purchasedItems' => $purchasedItems,
-        
     ]);
 }
 }
