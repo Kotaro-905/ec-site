@@ -10,6 +10,13 @@ services:
             - ./src:/var/www/
         depends_on:
             - php
+            - mailhog
+
+    mailhog:
+       image: mailhog/mailhog
+       ports:
+            - "1025:1025"
+            - "8025:8025"
 
     php:
         build: ./docker/php
@@ -41,3 +48,5 @@ services:
             - mysql
         ports:
             - 8080:80
+
+    
