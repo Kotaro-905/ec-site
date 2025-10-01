@@ -114,9 +114,9 @@ class ItemController extends Controller
         return view('items.create', compact('categories', 'conditions'));
     }
 
-    public function store(Request $request)
-    {
-      $validated = $request->validate([
+   public function store(Request $request)
+{
+    $validated = $request->validate([
         'image'        => ['nullable', 'image', 'max:4096'],
         'name'         => ['required', 'string', 'max:100'],
         'brand'        => ['nullable', 'string', 'max:100'],
@@ -124,28 +124,32 @@ class ItemController extends Controller
         'price'        => ['required', 'integer', 'min:1', 'max:99999999'],
         'condition'    => ['required', 'integer', 'between:1,5'],
         'category_id'  => ['nullable', 'integer', 'exists:categories,id'],
-      ]);
+    ]);
 
-      $item = new Item();
-      $item->user_id     = $request->user()->id;              //  出品者IDを保存
-      $item->name        = $validated['name'];
-      $item->brand       = $validated['brand'] ?? null;
-      $item->description = $validated['description'] ?? null;
-      $item->price       = $validated['price'];
-      $item->condition   = $validated['condition'];
-      $item->category_id = $validated['category_id'] ?? 1;
-      $item->status      = 1;                                  // 公開
-      if ($request->hasFile('image')) {
+    $item = new \App\Models\Item();
+    $item->user_id     = $request->user()->id;       // ← 出品者IDを保存
+    $item->name        = $validated['name'];
+    $item->brand       = $validated['brand'] ?? null;
+    $item->description = $validated['description'] ?? null;
+    $item->price       = $validated['price'];
+    $item->condition   = $validated['condition'];
+    $item->category_id = $validated['category_id'] ?? 1;
+    $item->status      = 1;                           // 公開
+
+    if ($request->hasFile('image')) {
         $item->image = $request->file('image')->store('items', 'public');
     }
+
     $item->save();
 
-    // （旧：セッション積み上げ/ 将来削除）
-    $ids = $request->session()->get('my_listed_item_ids', []);
-    array_unshift($ids, (int) $item->id);
-    $ids = array_values(array_unique($ids));
-    $request->session()->put('my_listed_item_ids', $ids);
+    // ↓↓↓ 旧: セッションへの積み上げは削除
+    // $ids = $request->session()->get('my_listed_item_ids', []);
+    // array_unshift($ids, (int)$item->id);
+    // $ids = array_values(array_unique($ids));
+    // $request->session()->put('my_listed_item_ids', $ids);
 
-    return redirect()->route('profile.show')->with('status', '出品しました。');
-  }
+    return redirect()
+        ->route('profile.show')
+        ->with('status', '出品しました。');
+}
 }

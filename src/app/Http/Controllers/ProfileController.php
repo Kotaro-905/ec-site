@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use App\Models\User;
 use Illuminate\Support\Facades\DB; 
-use App\Models\OrderItem;
+use Illuminate\Support\Str;
 
 class ProfileController extends Controller
 {
@@ -27,30 +27,47 @@ class ProfileController extends Controller
 
     /** 更新処理 */
     public function update(Request $request)
-    {
-        $request->validate([
-            'name'        => ['required', 'string', 'max:255'],
-            'image'       => ['nullable', 'image', 'max:4096'],
-            'postal_code' => ['nullable', 'string', 'max:16'],
-            'address'     => ['nullable', 'string', 'max:255'],
-            'building'    => ['nullable', 'string', 'max:255'],
-        ]);
+{
+    $request->validate([
+        'name'        => ['required', 'string', 'max:255'],
+        // 画像は最大 4MB / 画像ファイルのみ
+        'image'       => ['nullable', 'image', 'max:4096', 'mimes:jpeg,png,jpg,gif,webp'],
+        'postal_code' => ['nullable', 'string', 'max:16'],
+        'address'     => ['nullable', 'string', 'max:255'],
+        'building'    => ['nullable', 'string', 'max:255'],
+    ]);
 
-        $user = $request->user();
+    $user = $request->user();
 
+    DB::transaction(function () use ($request, $user) {
         // --- users 更新 ---
         $user->name = $request->input('name', $user->name);
 
         // 画像差し替え（/storage/app/public/avatars に保存）
         if ($request->hasFile('image')) {
-            $newPath = $request->file('image')->store('avatars', 'public');
+            $file = $request->file('image');
 
-            // 以前の画像があれば削除（自分でアップしたもののみ対象）
-            if ($user->image && str_starts_with($user->image, 'avatars/')) {
+            // 例: 5_20241001_193012_abcd12.jpg
+            $filename = sprintf(
+                '%s_%s_%s.%s',
+                $user->id,
+                now()->format('Ymd_His'),
+                Str::random(6),
+                $file->getClientOriginalExtension()
+            );
+
+            // public ディスクに保存（=> public/storage/avatars/... で参照できる）
+            $newPath = $file->storeAs('avatars', $filename, 'public');
+
+            // 以前の画像があれば削除（自分がアップした avatars/ のみ）
+            if ($user->image
+                && Str::startsWith($user->image, 'avatars/')
+                && Storage::disk('public')->exists($user->image)
+            ) {
                 Storage::disk('public')->delete($user->image);
             }
 
-            
+            // DB には相対パス（例: avatars/xxx.jpg）を保存
             $user->image = $newPath;
         }
 
@@ -58,7 +75,8 @@ class ProfileController extends Controller
 
         // --- addresses を upsert ---
         $postal = $request->input('postal_code');
-        $postal = is_string($postal) ? str_replace('-', '', $postal) : null;
+        // ハイフン・空白を除去（数値だけに寄せる）
+        $postal = is_string($postal) ? preg_replace('/[\s\-]/', '', $postal) : null;
 
         Address::updateOrCreate(
             ['user_id' => $user->id],
@@ -68,13 +86,15 @@ class ProfileController extends Controller
                 'building'    => $request->input('building'),
             ]
         );
+    });
 
-        // このリクエスト内で参照する場合の最新化
-        $request->user()->refresh();
+    // このリクエスト内で参照する場合の最新化
+    $request->user()->refresh();
 
-        // プロフィールへ戻る
-        return redirect()->route('profile.show')->with('status', 'プロフィールを更新しました。');
-    }
+    return redirect()
+        ->route('profile.show')
+        ->with('status', 'プロフィールを更新しました。');
+}
 
     /** プロフィール表示（出品リストはセッションのID順で） */
   public function show(Request $request)
@@ -82,16 +102,11 @@ class ProfileController extends Controller
     $user = $request->user();
     $tab  = $request->query('tab', 'listed');
 
-    // 出品した商品（現状のまま）
-    $listedItems = collect();
-    $ids = array_values(array_unique(array_map('intval',
-        $request->session()->get('my_listed_item_ids', [])
-    )));
-    if (!empty($ids)) {
-        $listedItems = Item::whereIn('id', $ids)
-            ->orderByRaw('FIELD(id, '.implode(',', $ids).')')
-            ->get(['id','name','image','price','status']);
-    }
+    // ▼ 出品した商品（items.user_id で取得）
+    $listedItems = Item::select('id','name','image','price','status')
+        ->where('user_id', $user->id)
+        ->latest()
+        ->get();
 
     // 購入した商品：order_items → items の2段階（配列に確実にしてから検索）
     $purchasedIds = DB::table('order_items')

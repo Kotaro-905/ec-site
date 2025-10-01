@@ -158,6 +158,8 @@ return [
             Laravel\Fortify\Features::registration(),
             Laravel\Fortify\Features::resetPasswords(),
         ]),
+        
+        Features::emailVerification(),
     ],
 
 ];

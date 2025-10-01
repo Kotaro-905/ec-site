@@ -10,14 +10,12 @@
         @csrf
         @method('PUT')
 
-        @php
-        $avatarUrl = $user->image ? Storage::url($user->image) : asset('images/avatar-placeholder.png');
-        @endphp
-
         <div class="avatar">
             <div class="avatar__circle">
-                <img src="{{ auth()->user()->image ? asset('storage/' . auth()->user()->image) : asset('images/default-avatar.png') }}"
-                    alt="プロフィール画像">
+                {{-- ▼ プレビュー画像：users.image を優先。無ければデフォルト --}}
+                <img
+                  src="{{ $user->image ? asset('storage/' . $user->image) : asset('images/default-avatar.png') }}"
+                  alt="プロフィール画像">
             </div>
             <label class="avatar__button">
                 画像を選択する
@@ -28,7 +26,7 @@
         <div class="field">
             <label class="label" for="name">ユーザー名</label>
             <input class="input" id="name" name="name" type="text"
-                value="{{ old('name', auth()->user()->name) }}">
+                value="{{ old('name', $user->name) }}">
         </div>
 
         <div class="field">

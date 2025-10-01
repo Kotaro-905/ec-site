@@ -15,7 +15,11 @@
 <div class="profile">
   <div class="profile__header">
     <div class="profile__avatar">
-      <div class="avatar__ph"></div>
+      {{-- ▼ ここだけ置き換え --}}
+      <img
+        src="{{ $user->image ? asset('storage/'.$user->image) : asset('images/default-avatar.png') }}"
+        alt="プロフィール画像"
+        class="avatar__img">
     </div>
     <div class="profile__meta">
       <h1 class="profile__name">{{ $user->name ?? 'ユーザー名' }}</h1>
@@ -40,9 +44,8 @@
         <p class="profile__empty">…まだ出品がありません。</p>
       @endforelse
     @else
-     
       @forelse ($purchasedItems as $item)
-          @include('partials.item-card', ['item' => $item])
+        @include('partials.item-card', ['item' => $item])
       @empty
         <p class="profile__empty">…まだ購入履歴がありません。</p>
       @endforelse
@@ -50,7 +53,6 @@
   </div>
 </div>
 @endsection
-
 
 
 

@@ -17,14 +17,30 @@ class LoginController extends Controller
         
         $credentials = $request->only('email', 'password');
 
-        if (!Auth::attempt($credentials, false)) {
-            // 2. 入力情報が誤っている場合の共通メッセージ
-            return back()
-                ->withErrors(['login' => 'ログイン情報が登録されていません'])
-                ->withInput($request->except('password'));
+        if (Auth::attempt($request->only('email','password'), true)) {
+            $request->session()->regenerate();
+
+            // まだメール認証していない場合は誘導ページへ
+            if (! $request->user()->hasVerifiedEmail()) {
+                return redirect()->route('verification.notice');
+            }
+
+            // 認証済みなら商品一覧へ
+            return redirect()->route('items.index');
         }
 
-        $request->session()->regenerate();
-        return redirect()->intended(route('items.index'));
+        return back()->withErrors([
+            'email' => 'ログイン情報が登録されていません',
+        ]);
+    }
+
+    public function logout(LoginRequest $request)
+    {
+        Auth::logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        // ログアウト後はログイン画面へ
+        return redirect()->route('login');
     }
 }
