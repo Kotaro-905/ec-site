@@ -20,34 +20,30 @@
                     <img src="{{ asset('logo.svg') }}" alt="COACHTECH" class="header__logo-img">
                 </a>
 
-                <form class="header__search" action="{{ route('items.search') }}" method="get" role="search">
-                    <input class="header__search-input"
-                        type="search"
-                        name="q"
-                        placeholder="なにをお探しですか？"
-                        value="{{ request('q') }}">
-                    <input type="hidden" name="tab" value="{{ request('tab', 'recommend') }}">
-                </form>
+               <form class="header__search" action="{{ route('items.search') }}" method="get" role="search">
+               <input class="header__search-input" type="search" name="q"
+                placeholder="なにをお探しですか？" value="{{ request('q') }}">
+            <input type="hidden" name="tab" value="{{ request('tab', 'recommend') }}">
+              </form>
 
                 <nav class="header__nav">
-                    @auth
-                    <!-- ログアウト（実際に機能する） -->
-                    <a class="header__link" href="{{ route('logout') }}"
-                        onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-                        ログアウト
-                    </a>
-                    <form id="logout-form" action="{{ route('logout') }}" method="post" style="display:none;">
-                        @csrf
-                    </form>
+           @auth
+               <a class="header__link" href="{{ route('logout') }}"
+                onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                ログアウト
+             </a>
+              <form id="logout-form" action="{{ route('logout') }}" method="post" style="display:none;">
+             @csrf
+             </form>
 
-
-                    <a class="header__link" href="{{ route('profile.show') }}">マイページ</a>
-                    <a class="header__button" href="{{ route('items.create') }}">出品</a>
-                    @else
-                    <a class="header__link" href="{{ route('auth.login') }}">ログイン</a>
-                    <a class="header__link" href="{{ route('auth.register') }}">会員登録</a>
-                    @endauth
-                </nav>
+              <a class="header__link" href="{{ route('profile.show') }}">マイページ</a>
+              <a class="header__button" href="{{ route('items.create') }}">出品</a>
+           @else
+           {{-- ここを修正 --}}
+            <a class="header__link" href="{{ route('login') }}">ログイン</a>
+            <a class="header__link" href="{{ route('register') }}">会員登録</a>
+          @endauth
+           </nav>
             </div>
         </div>
     </header>

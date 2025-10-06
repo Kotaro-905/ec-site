@@ -48,18 +48,26 @@
             {{-- 商品の情報 --}}
             <h2 class="sec">商品の情報</h2>
             <dl class="show__spec">
-                <dt>カテゴリー</dt>
-                <dd class="chips">
-                    @forelse($item->categories as $category)
-                    <span class="chip">{{ $category->name }}</span>
-                    @empty
-                    -
-                    @endforelse
-                </dd>
+             <dt>カテゴリー</dt>
+            <dd class="chips">
+               @php
+                // 1) 多対多があればそれを表示、無ければ主カテゴリ(category_id)を1つだけ表示
+                $cats = $item->categories->isNotEmpty()
+                ? $item->categories
+                : collect(array_filter([$item->category])); // null を除去
+               @endphp
 
-                <dt>商品の状態</dt>
-                <dd>{{ $item->condition_label ?? '-' }}</dd>
-            </dl>
+                @forelse ($cats as $category)
+                 <span class="chip">{{ $category->name }}</span>
+                 @empty
+                   -
+                 @endforelse
+                  </dd>
+
+                 <dt>商品の状態</dt>
+                  <dd>{{ $item->condition_label ?? '-' }}</dd>
+                 </dl>
+
 
             {{-- コメント --}}
             <h2 class="sec">コメント({{ $item->comments->count() }})</h2>

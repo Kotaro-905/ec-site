@@ -14,7 +14,9 @@ class ItemSeeder extends Seeder
         $now = Carbon::now();
 
         // categories の name→id マップ
-        $catIdByName = Category::pluck('id', 'name');
+        $catIdByName = Category::all()->pluck('id', 'name')->mapWithKeys(function ($id, $name) {
+    return [trim($name) => $id];
+});
 
         // 商品名→カテゴリ名
         $catMapByName = [
@@ -125,7 +127,7 @@ class ItemSeeder extends Seeder
 
         foreach ($items as $row) {
             $catIds = collect($catMapByName[$row['name']] ?? [])
-                ->map(fn($n) => $catIdByName[$n] ?? null)
+                ->map(fn($n) => $catIdByName[trim($n)] ?? null)
                 ->filter()
                 ->values()
                 ->all();

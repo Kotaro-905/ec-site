@@ -7,14 +7,20 @@
 @endsection
 
 @section('content')
-<div class="items">
-    <div class="items__tabs">
-        <a href="{{ route('items.index', ['tab'=>'recommend', 'q'=>request('q')]) }}"
-            class="items__tab {{ $tab==='recommend' ? 'is-active' : '' }}">おすすめ</a>
 
-        <a href="{{ route('items.index', ['tab'=>'mylist', 'q'=>request('q')]) }}"
-            class="items__tab {{ $tab==='mylist' ? 'is-active' : '' }}">マイリスト</a>
-    </div>
+@php $q = request('q'); @endphp
+
+<div class="items__tabs">
+  <a href="{{ route('items.index', ['tab' => 'recommend'] + request()->only('q')) }}"
+     class="items__tab {{ $tab==='recommend' ? 'is-active' : '' }}">
+    おすすめ
+  </a>
+
+  <a href="{{ route('items.index', ['tab' => 'mylist'] + request()->only('q')) }}"
+     class="items__tab {{ $tab==='mylist' ? 'is-active' : '' }}">
+    マイリスト
+  </a>
+</div>
 
     @if($tab==='mylist' && !auth()->check())
     <p class="items__note">…ログインするとマイリストが見られます。</p>
@@ -47,8 +53,10 @@
         @endforelse
     </div>
 
-    @if(method_exists($items,'links'))
-    <div class="items__pager">{{ $items->withQueryString()->links() }}</div>
-    @endif
+   @if (method_exists($items, 'links'))
+  <div class="items__pager">
+    {{ $items->appends(request()->only('q','tab'))->links() }}
+  </div>
+   @endif
 </div>
 @endsection

@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('layouts.auth-header')
 
 @section('title','メール認証')
 
