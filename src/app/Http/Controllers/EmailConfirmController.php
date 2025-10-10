@@ -10,13 +10,13 @@ class EmailConfirmController extends Controller
     // 誘導画面（「認証はこちらから」）
     public function notice()
     {
-        return view('auth.verify-email');
+        return view('auth.verify');
     }
 
     // 中間画面（「認証する」ボタン）
     public function show()
     {
-        return view('auth.verify');
+        return view('auth.verify-email'); // verify-email.blade.php を返す
     }
 
     // 「認証する」→ 署名URL生成 → 本家 verify へ

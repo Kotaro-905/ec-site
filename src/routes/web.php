@@ -9,6 +9,7 @@ use App\Http\Controllers\ItemController;
 use App\Http\Controllers\PurchaseController;
 use App\Http\Controllers\EmailConfirmController;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
+use App\Http\Controllers\VerificationController;
 
 
 // 会員登録フォーム表示
@@ -36,6 +37,10 @@ Route::get('/email/verify', [EmailConfirmController::class, 'notice'])
 Route::get('/email/verify/confirm', [EmailConfirmController::class, 'show'])
     ->middleware('auth')
     ->name('verification.confirm');
+
+Route::get('/verification/check', [VerificationController::class, 'check'])
+    ->name('verification.check')
+    ->middleware('auth');
 
 // 3) 「認証する」押下 → 署名付きURLを作り、本家 verify に飛ばす
 Route::post('/email/verify/perform', [EmailConfirmController::class, 'perform'])

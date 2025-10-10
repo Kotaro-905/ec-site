@@ -4,6 +4,12 @@
 
 @section('css')
 <link rel="stylesheet" href="{{ asset('css/items-show.css') }}">
+{{-- 簡易エラースタイル --}}
+<style>
+  .is-invalid { border: 1px solid #e74c3c; }
+  .invalid-feedback { color:#e74c3c; font-size: .9rem; margin-top:.4rem; }
+  .flash { background:#f5fff5; border:1px solid #c7eec7; color:#2d7a2d; padding:.6rem .8rem; border-radius:.4rem; margin-bottom:1rem; }
+</style>
 @endsection
 
 @section('content')
@@ -24,6 +30,11 @@
             <h1 class="show__title">{{ $item->name }}</h1>
             <div class="show__brand">{{ $item->brand ?? 'ブランド名' }}</div>
             <div class="show__price">¥{{ number_format($item->price ?? 0) }} <small>(税込)</small></div>
+
+            {{-- 送信後メッセージ（任意） --}}
+            @if (session('status'))
+                <div class="flash">{{ session('status') }}</div>
+            @endif
 
             <div class="show__actions">
                 {{-- いいね --}}
@@ -68,7 +79,6 @@
                   <dd>{{ $item->condition_label ?? '-' }}</dd>
                  </dl>
 
-
             {{-- コメント --}}
             <h2 class="sec">コメント({{ $item->comments->count() }})</h2>
 
@@ -77,20 +87,31 @@
                 <div class="cmt-avatar"></div>
                 <div class="cmt-main">
                     <div class="cmt-name">{{ $c->user->name ?? 'user' }}</div>
-                    <div class="cmt-bubble">{{ $c->comment }}</div>
+                    {{-- 改行を保持して安全表示 --}}
+                    <div class="cmt-bubble">{!! nl2br(e($c->comment)) !!}</div>
                 </div>
             </div>
             @empty
             <p class="muted">まだコメントはありません。</p>
             @endforelse
 
-            {{-- コメント投稿フォーム（バリデーションなし） --}}
+            {{-- コメント投稿フォーム（FormRequestバリデーション対応版） --}}
             @auth
             <div class="cmt-form">
                 <label class="cmt-label">商品へのコメント</label>
                 <form action="{{ route('items.comments.store', $item) }}" method="post">
                     @csrf
-                    <textarea name="comment" rows="4" placeholder="こちらにコメントを入力します。">{{ old('comment') }}</textarea>
+                    <textarea
+                        name="comment"
+                        rows="4"
+                        placeholder="こちらにコメントを入力します。"
+                        class="{{ $errors->has('comment') ? 'is-invalid' : '' }}"
+                    >{{ old('comment') }}</textarea>
+
+                    @error('comment')
+                        <p class="invalid-feedback">{{ $message }}</p>
+                    @enderror
+
                     <button type="submit" class="cmt-submit">コメントを送信する</button>
                 </form>
             </div>

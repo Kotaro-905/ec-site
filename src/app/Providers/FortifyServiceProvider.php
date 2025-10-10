@@ -51,11 +51,15 @@ class FortifyServiceProvider extends ServiceProvider
             return view('auth.reset-password', ['request' => $request]);
         });
 
-         Fortify::verifyEmailView(function () {
-        return view('auth.verify-email'); 
-        });
-
-        
+       
+        $this->app->singleton(RegisterResponse::class, function () {
+        return new class implements RegisterResponse {
+            public function toResponse($request)
+            {
+                return redirect()->route('verification.notice');
+            }
+        };
+    });
     }
 
 }

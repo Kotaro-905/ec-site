@@ -7,6 +7,7 @@ use App\Models\User;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Http\Request;
 
 class RegisterController extends Controller
 {
@@ -30,4 +31,15 @@ class RegisterController extends Controller
         
         return redirect()->route('verification.notice');
     }
+
+    protected function registered(Request $request, $user)
+{
+    // 未認証ユーザーを「メール認証のお願い」画面へ誘導
+    if (! $user->hasVerifiedEmail()) {
+        return redirect()->route('verification.notice');
+    }
+
+    // 認証済み（再登録など）なら通常ホームへ
+    return redirect()->route('items.index');
+}
 }

@@ -6,6 +6,7 @@ use App\Models\Item;
 use App\Models\Category;
 use App\Models\Comment;
 use App\Models\Like;
+use App\Http\Requests\StoreCommentRequest;
 use Illuminate\Http\Request;
 
 class ItemController extends Controller
@@ -115,19 +116,16 @@ class ItemController extends Controller
     /**
      * コメント投稿
      */
-    public function storeComment(Request $request, Item $item)
+    public function storeComment(StoreCommentRequest $request, Item $item)
     {
-        $request->validate([
-            'comment' => ['required', 'string', 'max:2000'],
-        ]);
-
         Comment::create([
-            'user_id' => $request->user()->id,
-            'item_id' => $item->id,
-            'comment' => $request->input('comment'),
-        ]);
+            
+        'user_id' => $request->user()->id,
+        'item_id' => $item->id,
+        'comment' => $request->validated('comment'), 
+    ]);
 
-        return back();
+         return back()->with('status', 'コメントを投稿しました。');
     }
 
     /**

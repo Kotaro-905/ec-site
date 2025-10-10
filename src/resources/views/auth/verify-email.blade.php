@@ -1,44 +1,77 @@
-@extends('layouts.auth-header')
+@extends('layouts.app')
 
-@section('title', 'メール認証のお願い')
+@section('title', 'メール認証の手順')
+
+@section('css')
+<style>
+  .verify-card {
+      max-width: 520px;
+      margin: 4rem auto;
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      padding: 2rem 2.5rem;
+      text-align: center;
+  }
+  .verify-card h1 {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: #222;
+      margin-bottom: 1rem;
+  }
+  .verify-card p {
+      color: #333;
+      line-height: 1.6;
+      text-align: left;
+  }
+  .verify-card ol {
+      text-align: left;
+      color: #333;
+      margin: 1rem 0;
+      padding-left: 1.2rem;
+  }
+  .verify-btn {
+      display: block;
+      width: 100%;
+      padding: 0.9rem;
+      border-radius: 6px;
+      font-weight: bold;
+      margin-top: 1rem;
+      text-decoration: none;
+  }
+  .verify-btn.green { background: #22c55e; color: #fff; }
+  .verify-btn.gray  { background: #e5e7eb; color: #111827; }
+  .verify-btn.blue  { background: #c7d2fe; color: #1e3a8a; }
+</style>
+@endsection
 
 @section('content')
-<style>
+<div class="verify-card">
+    <h1>メール認証の手順</h1>
+    <p>ご登録いただいたメールに記載されたURLを開いて、メール認証を完了してください。ブラウザを切り替えた後も、この画面は開いたままで問題ありません。</p>
 
-.verify {
-  max-width: 880px; margin: 60px auto; padding: 48px 32px;
-  background: #fff; border-radius: 16px;
-  box-shadow: 0 12px 32px rgba(0,0,0,.06);
-  text-align: center;
-}
-.verify__title { font-size: 40px; font-weight: 800; margin-bottom: 24px; }
-.verify__lead  { font-size: 20px; line-height: 1.9; color:#333; margin-bottom: 40px; }
-.verify__btn   {
-  display:inline-block; min-width: 280px; padding:16px 28px;
-  background:#f85b5b; color:#fff; border:none; border-radius:10px;
-  font-size:18px; font-weight:700; cursor:pointer;
-}
-.verify__link  {
-  margin-top: 24px; display:inline-block; color:#1a73e8; font-weight:600;
-  background:none; border:none; cursor:pointer; text-decoration:underline;
-}
-.verify__flash { margin:18px 0 0; color:#43a047; font-weight:700; }
-</style>
+    <ol>
+        <li>メール内の「メールアドレスを確認する」ボタン（または記載されたURL）をクリックします。</li>
+        <li>ブラウザで認証が完了すると、自動的にログイン状態が更新されます。</li>
+        <li>認証後は下のボタンから商品一覧画面に進めます。</li>
+    </ol>
 
-<section class="card card--wide">
-  <h1 class="title">メール認証のお願い</h1>
-  <p>登録していただいたメールアドレス宛に認証メールを送付しました。メール内のリンクをクリックして認証を完了してください。</p>
+    {{-- 商品一覧へ進む --}}
+    <form method="GET" action="{{ route('verification.check') }}">
+        @csrf
+        <button type="submit" class="verify-btn green">商品一覧へ進む</button>
+    </form>
 
-  <div class="actions" style="margin-top:24px">
-    {{-- ここを中間画面へ（GET遷移） --}}
-    <a href="{{ route('verification.confirm') }}" class="btn-primary" style="display:inline-block;padding:.9rem 1.8rem;">
-      認証はこちらから
-    </a>
-  </div>
+    {{-- 認証メール再送 --}}
+    <form method="POST" action="{{ route('verification.send') }}">
+        @csrf
+        <button type="submit" class="verify-btn gray">認証メールを再送する</button>
+    </form>
 
-  <form method="POST" action="{{ route('verification.send') }}" style="margin-top:12px">
-      @csrf
-      <button type="submit" class="link">認証メールを再送する</button>
-  </form>
-</section>
+    {{-- ログアウト --}}
+    <form method="POST" action="{{ route('logout') }}">
+        @csrf
+        <button type="submit" class="verify-btn blue">ログアウト</button>
+    </form>
+</div>
 @endsection
