@@ -1,0 +1,173 @@
+:root {
+    --bg-outer: #202020;
+    --bg-card: #fff;
+    --text: #222;
+    --muted: #666;
+    --border: #cfcfcf;
+    --primary: #ff6666;
+    --primary-hover: #ff5454;
+    --danger: #d93025;
+    --focus: #8ab4ff;
+    --radius: 6px;
+}
+
+/* 全体 */
+* {
+    box-sizing: border-box
+}
+
+html,
+body {
+    height: 100%
+}
+
+body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+        "Noto Sans JP", "Hiragino Kaku Gothic ProN", "Yu Gothic", Meiryo, sans-serif;
+    color: var(--text);
+    background: var(--bg-outer);
+}
+
+/* ヘッダー */
+.header__bar {
+    background: #000;
+}
+
+.header__inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 12px 20px;
+}
+
+.header__logo-img {
+    height: 28px;
+    display: block
+}
+
+/* レイアウト */
+.page {
+    min-height: calc(100vh - 52px);
+    display: grid;
+    place-items: center;
+    padding: 24px;
+}
+
+.card {
+    width: min(880px, 95vw);
+    background: var(--bg-card);
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, .12);
+    padding: 56px 48px 44px;
+    min-height: 500px;
+}
+
+/* タイトル */
+.title {
+    margin: 0 0 28px;
+    text-align: center;
+    font-size: 26px;
+    letter-spacing: .02em;
+}
+
+/* フォーム */
+.field {
+    margin: 18px 0;
+}
+
+.field label {
+    display: block;
+    font-weight: 600;
+    margin: 0 0 8px;
+}
+
+.field input {
+    width: 100%;
+    height: 44px;
+    padding: 0 12px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: #fff;
+    font-size: 16px;
+    transition: border-color .15s, box-shadow .15s;
+}
+
+.field input:focus {
+    outline: 0;
+    border-color: var(--focus);
+    box-shadow: 0 0 0 3px color-mix(in oklab, var(--focus) 30%, transparent);
+}
+
+/* エラー表示（Laravelの@error用） */
+.error {
+    margin-top: 8px;
+    color: var(--danger);
+    font-size: 13px;
+}
+
+/* ボタン */
+.actions {
+    margin: 28px 0 8px;
+}
+
+.btn-primary {
+    width: 100%;
+    height: 48px;
+    border: none;
+    border-radius: 10px;
+    background: var(--primary);
+    color: #fff;
+    font-weight: 700;
+    letter-spacing: .06em;
+    cursor: pointer;
+    transition: transform .02s ease, background-color .15s ease, opacity .15s ease;
+}
+
+.btn-primary:hover {
+    background: var(--primary-hover)
+}
+
+.btn-primary:active {
+    transform: translateY(1px)
+}
+
+.btn-primary:disabled {
+    opacity: .6;
+    cursor: not-allowed
+}
+
+/* 下部リンク */
+.link {
+    margin: 6px 0 0;
+    text-align: center;
+    font-size: 14px;
+    color: var(--muted);
+}
+
+.link a {
+    color: #1a73e8;
+    text-decoration: none;
+}
+
+.link a:hover {
+    text-decoration: underline
+}
+
+/* 画面幅が狭いときの調整 */
+@media (max-width:520px) {
+    .card {
+        padding: 28px 20px 24px
+    }
+
+    .title {
+        font-size: 22px
+    }
+
+    .field input {
+        height: 42px
+    }
+
+    .btn-primary {
+        height: 46px
+    }
+}

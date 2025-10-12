@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="ja">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>@yield('title', 'COACHTECH')</title>
+    <link rel="stylesheet" href="{{ asset('css/app.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/sanitize.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/items-show.css') }}">
+    @yield('css')
+</head>
+
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header__bar">
+            <div class="header__inner">
+                <a href="{{ route('items.index') }}" class="header__logo">
+                    <img src="{{ asset('logo.svg') }}" alt="COACHTECH" class="header__logo-img">
+                </a>
+
+               <form class="header__search" action="{{ route('items.search') }}" method="get" role="search">
+               <input class="header__search-input" type="search" name="q"
+                placeholder="なにをお探しですか？" value="{{ request('q') }}">
+            <input type="hidden" name="tab" value="{{ request('tab', 'recommend') }}">
+              </form>
+
+                <nav class="header__nav">
+           @auth
+               <a class="header__link" href="{{ route('logout') }}"
+                onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                ログアウト
+             </a>
+              <form id="logout-form" action="{{ route('logout') }}" method="post" style="display:none;">
+             @csrf
+             </form>
+
+              <a class="header__link" href="{{ route('profile.show') }}">マイページ</a>
+              <a class="header__button" href="{{ route('items.create') }}">出品</a>
+           @else
+           {{-- ここを修正 --}}
+            <a class="header__link" href="{{ route('login') }}">ログイン</a>
+            <a class="header__link" href="{{ route('register') }}">会員登録</a>
+          @endauth
+           </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main -->
+    <main class="page">
+        @yield('content')
+    </main>
+    @stack('scripts')
+</body>
+
+</html>
