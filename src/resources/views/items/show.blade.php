@@ -37,20 +37,26 @@
             @endif
 
             <div class="show__actions">
-                {{-- いいね --}}
-                <div class="likes">
-                    <form method="POST" action="{{ route('items.like', $item) }}">
-                        @csrf
-                        <button type="submit" class="likes__btn {{ $liked ? 'is-liked' : '' }}">
-                            {{ $liked ? '★' : '☆' }}
-                        </button>
-                        <span class="likes__count">{{ $likesCount }}</span>
-                    </form>
-                </div>
+             <div class="item-stats">
+               {{-- いいね --}}
+                <form method="POST" action="{{ route('items.like', $item) }}" class="stat">
+                @csrf
+                <button type="submit" class="stat__icon {{ $liked ? 'is-liked' : '' }}">
+                   {{ $liked ? '★' : '☆' }}
+                   </button>
+                    <span class="stat__num">{{ $likesCount }}</span>
+                   </form>
 
-                {{-- 購入（ダミー） --}}
-                <a class="buy-btn" href="{{ route('purchase.create', $item) }}">購入手続きへ</a>
-            </div>
+                 {{-- コメント数 --}}
+                   <div class="stat">
+                   <span class="stat__icon">💬</span>
+                  <span class="stat__num">{{ $item->comments->count() }}</span>
+                   </div>
+                   </div>
+        
+             {{-- 購入ボタン --}}
+           <a href="{{ route('purchase.create', $item) }}" class="buy-btn">購入手続きへ</a>
+        </div>
 
             {{-- 商品説明 --}}
             <h2 class="sec">商品説明</h2>
@@ -82,18 +88,24 @@
             {{-- コメント --}}
             <h2 class="sec">コメント({{ $item->comments->count() }})</h2>
 
-            @forelse($item->comments as $c)
-            <div class="cmt-row">
-                <div class="cmt-avatar"></div>
-                <div class="cmt-main">
-                    <div class="cmt-name">{{ $c->user->name ?? 'user' }}</div>
-                    {{-- 改行を保持して安全表示 --}}
-                    <div class="cmt-bubble">{!! nl2br(e($c->comment)) !!}</div>
-                </div>
-            </div>
-            @empty
-            <p class="muted">まだコメントはありません。</p>
-            @endforelse
+@forelse($item->comments as $c)
+    @php
+        // プロフィール画像（storage/app/public/... に保存想定）
+        $avatarUrl = ($c->user && $c->user->image)
+            ? asset('storage/'.$c->user->image)
+            : asset('images/default-avatar.png'); // プレースホルダー（無ければ用意）
+    @endphp
+
+    <div class="cmt-row">
+        <img class="cmt-avatar" src="{{ $avatarUrl }}" alt="{{ $c->user->name ?? 'user' }}のアイコン">
+        <div class="cmt-main">
+            <div class="cmt-name">{{ $c->user->name ?? 'user' }}</div>
+            <div class="cmt-bubble">{{ $c->comment }}</div>
+        </div>
+    </div>
+@empty
+    <p class="muted">まだコメントはありません。</p>
+@endforelse
 
             {{-- コメント投稿フォーム（FormRequestバリデーション対応版） --}}
             @auth
