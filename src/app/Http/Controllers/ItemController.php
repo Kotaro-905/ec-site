@@ -118,15 +118,24 @@ class ItemController extends Controller
      */
     public function storeComment(StoreCommentRequest $request, Item $item)
     {
-        Comment::create([
-            
+         // フォームリクエストを使う場合
+         $data = $request->validated();
+
+         // 万一配列で来ても文字列に
+          $comment = $data['comment'] ?? '';
+         if (is_array($comment)) {
+        $comment = implode('', $comment);
+         }
+          $comment = (string) $comment;
+
+        \App\Models\Comment::create([
         'user_id' => $request->user()->id,
         'item_id' => $item->id,
-        'comment' => $request->validated('comment'), 
+        'comment' => $comment,
     ]);
 
-         return back()->with('status', 'コメントを投稿しました。');
-    }
+    return back(); // 302 が返るのでテストの assertRedirect に一致
+     }
 
     /**
      * 出品フォーム
