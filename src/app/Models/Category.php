@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\{
@@ -16,13 +15,13 @@ class Category extends Model
 
     protected $fillable = ['name'];
 
-    
+
     public function primaryItems(): HasMany
     {
         return $this->hasMany(Item::class);
     }
 
-    
+
     public function items(): BelongsToMany
     {
         return $this->belongsToMany(Item::class, 'item_categories')

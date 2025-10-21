@@ -13,7 +13,6 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Contracts\Auth\MustVerifyEmail as MustVerifyEmailContract;
 use Illuminate\Auth\MustVerifyEmail as MustVerifyEmailTrait;
 
-
 /**
  * @property int $id
  * @property string $name
@@ -32,10 +31,12 @@ use Illuminate\Auth\MustVerifyEmail as MustVerifyEmailTrait;
 
 class User extends Authenticatable implements MustVerifyEmailContract
 {
-    use HasApiTokens, HasFactory, Notifiable;
+    use HasApiTokens;
+    use HasFactory;
+    use Notifiable;
 
     use Notifiable;
-    
+
     use MustVerifyEmailTrait;
 
 
@@ -98,9 +99,9 @@ class User extends Authenticatable implements MustVerifyEmailContract
 
     public function address(): HasOne
     {
-       
+
         return $this->hasOne(Address::class);
-        
+
     }
 
 

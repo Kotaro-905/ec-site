@@ -9,7 +9,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\OrderItem;
 
-
 class PurchaseController extends Controller
 {
     /** 購入手続き画面（支払い方法選択・配送先の確認） */
@@ -31,7 +30,7 @@ class PurchaseController extends Controller
         $user    = Auth::user();
         $address = $user?->address;
 
-       
+
         return view('purchase.create', [
             'item'    => $item,
             'user'    => $user,
@@ -49,11 +48,11 @@ class PurchaseController extends Controller
         $stripe = new \Stripe\StripeClient(config('services.stripe.secret'));
 
         // Sinatra の YOUR_DOMAIN に相当（実行中のホスト＋ポートを使う）
-        $origin = $request->getSchemeAndHttpHost();              
+        $origin = $request->getSchemeAndHttpHost();
         $successUrl = $origin . route('purchase.success', [], false) . '?session_id={CHECKOUT_SESSION_ID}';
-        $cancelUrl  = $origin . route('purchase.cancel',  [], false);
+        $cancelUrl  = $origin . route('purchase.cancel', [], false);
 
-        
+
         $session = $stripe->checkout->sessions->create([
             'mode' => 'payment',
             'payment_method_types' => [$data['payment_method']], // 'card' | 'konbini'
@@ -79,48 +78,48 @@ class PurchaseController extends Controller
     }
 
     /** 成功遷移（webhook なしで SOLD 反映 & セッションへ追加） */
-       public function success(Request $request)
+    public function success(Request $request)
     {
         $sessionId = $request->query('session_id');
         if (!$sessionId) {
-        return redirect()->route('items.index')->with('error', '決済セッションが見つかりませんでした。');
-       }
+            return redirect()->route('items.index')->with('error', '決済セッションが見つかりませんでした。');
+        }
 
         $stripe = new \Stripe\StripeClient(config('services.stripe.secret'));
 
         try {
-        $session = $stripe->checkout->sessions->retrieve($sessionId, []);
+            $session = $stripe->checkout->sessions->retrieve($sessionId, []);
         } catch (\Throwable $e) {
-           return redirect()->route('items.index')->with('error', '決済情報の取得に失敗しました。');
+            return redirect()->route('items.index')->with('error', '決済情報の取得に失敗しました。');
         }
 
-       $itemId = (int) ($session->metadata->item_id ?? 0);
-     $method = $session->payment_method_types[0] ?? ($session->metadata->method ?? 'card');
-       if (!$itemId) {
-        return redirect()->route('items.index')->with('error', '対象商品が特定できませんでした。');
+        $itemId = (int) ($session->metadata->item_id ?? 0);
+        $method = $session->payment_method_types[0] ?? ($session->metadata->method ?? 'card');
+        if (!$itemId) {
+            return redirect()->route('items.index')->with('error', '対象商品が特定できませんでした。');
         }
 
-         DB::transaction(function () use ($request, $itemId, $method) {
-        // 1) SOLD にする（2 = SOLD）
-        $item = Item::lockForUpdate()->find($itemId);
-        if ($item && (int)$item->status !== 2) {
-            $item->status = 2;
-            $item->save();
-        }
+        DB::transaction(function () use ($request, $itemId, $method) {
+            // 1) SOLD にする（2 = SOLD）
+            $item = Item::lockForUpdate()->find($itemId);
+            if ($item && (int)$item->status !== 2) {
+                $item->status = 2;
+                $item->save();
+            }
 
-        // 2) 購入履歴を保存（同じ item を二重で入れない軽いガード）
-        $exists = OrderItem::where('user_id', $request->user()->id)
-            ->where('item_id', $itemId)
-            ->exists();
+            // 2) 購入履歴を保存（同じ item を二重で入れない軽いガード）
+            $exists = OrderItem::where('user_id', $request->user()->id)
+                ->where('item_id', $itemId)
+                ->exists();
 
-        if (!$exists) {
-            OrderItem::create([
-                'user_id'        => $request->user()->id,
-                'item_id'        => $itemId,
-                'payment_method' => $method === 'konbini' ? 2 : 1,
-              ]);
-           }
-       });
+            if (!$exists) {
+                OrderItem::create([
+                    'user_id'        => $request->user()->id,
+                    'item_id'        => $itemId,
+                    'payment_method' => $method === 'konbini' ? 2 : 1,
+                  ]);
+            }
+        });
 
         return redirect()->route('items.index')->with('status', '購入処理を完了しました。');
     }

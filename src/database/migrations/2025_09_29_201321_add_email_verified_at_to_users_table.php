@@ -12,21 +12,21 @@ class AddEmailVerifiedAtToUsersTable extends Migration
      * @return void
      */
     public function up()
-{
-    Schema::table('users', function (Blueprint $table) {
-        $table->timestamp('email_verified_at')->nullable()->after('email');
-    });
-}
+    {
+        Schema::table('users', function (Blueprint $table) {
+            $table->timestamp('email_verified_at')->nullable()->after('email');
+        });
+    }
 
     /**
      * Reverse the migrations.
      *
      * @return void
      */
-   public function down()
-{
-    Schema::table('users', function (Blueprint $table) {
-        $table->dropColumn('email_verified_at');
-    });
-}
+    public function down()
+    {
+        Schema::table('users', function (Blueprint $table) {
+            $table->dropColumn('email_verified_at');
+        });
+    }
 }

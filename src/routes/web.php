@@ -11,7 +11,6 @@ use App\Http\Controllers\EmailConfirmController;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use App\Http\Controllers\VerificationController;
 
-
 // 会員登録フォーム表示
 Route::get('/register', [RegisterController::class, 'register'])->name('register');
 
@@ -79,11 +78,11 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/profile', [ProfileController::class, 'show'])->name('profile.show');
 
-    Route::get('/items/{item}/buy',  [PurchaseController::class, 'create'])->name('purchase.create');
+    Route::get('/items/{item}/buy', [PurchaseController::class, 'create'])->name('purchase.create');
     Route::post('/items/{item}/buy', [PurchaseController::class, 'store'])->name('purchase.store');
 
     Route::get('/purchase/success', [PurchaseController::class, 'success'])->name('purchase.success');
-    Route::get('/purchase/cancel',  [PurchaseController::class, 'cancel'])->name('purchase.cancel');
+    Route::get('/purchase/cancel', [PurchaseController::class, 'cancel'])->name('purchase.cancel');
 
     Route::post('/purchase/checkout/{item}', [PurchaseController::class, 'checkout'])
         ->where('item', '[0-9]+')
@@ -93,14 +92,11 @@ Route::middleware('auth')->group(function () {
         ->where('item', '[0-9]+')
         ->name('purchase.create');
 
-    Route::get('/purchase/{item}/address',  [PurchaseController::class, 'editAddress'])->name('purchase.address.edit');
-    Route::put('/purchase/{item}/address',  [PurchaseController::class, 'updateAddress'])->name('purchase.address.update');
+    Route::get('/purchase/{item}/address', [PurchaseController::class, 'editAddress'])->name('purchase.address.edit');
+    Route::put('/purchase/{item}/address', [PurchaseController::class, 'updateAddress'])->name('purchase.address.update');
 });
 
 // ★ 商品詳細は“最後”に置く + 数値IDだけ許可
 Route::get('/items/{item}', [ItemController::class, 'show'])
     ->whereNumber('item')
     ->name('items.show');
-
-
-

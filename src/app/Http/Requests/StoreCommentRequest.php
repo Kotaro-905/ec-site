@@ -18,7 +18,7 @@ class StoreCommentRequest extends FormRequest
         $comment = $this->input('comment');
 
         if (is_string($comment)) {
-            
+
             $comment = trim($comment);
         }
 

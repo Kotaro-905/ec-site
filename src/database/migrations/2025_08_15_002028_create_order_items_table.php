@@ -6,7 +6,8 @@ use Illuminate\Support\Facades\Schema;
 
 class CreateOrderItemsTable extends Migration
 {
-    public function up(): void {
+    public function up(): void
+    {
         Schema::create('order_items', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('user_id')->nullable(false);
@@ -25,11 +26,10 @@ class CreateOrderItemsTable extends Migration
             $table->index('item_id');
         });
     }
-  
-  
-    public function down(): void {
+
+
+    public function down(): void
+    {
         Schema::dropIfExists('order_items');
     }
 };
-
-

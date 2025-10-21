@@ -40,24 +40,24 @@ class IndexTest extends TestCase
 
     /* 便利関数: アイテムを手動作成 */
     private function makeItem(User $owner, array $overrides = []): Item
-{
-    $base = [
-        'user_id'     => $owner->id,
-        'category_id' => $this->categoryId,
-        'name'        => 'ITEM-'.Str::random(5),
-        'brand'       => 'テストブランド',
-        'description' => 'テスト説明',
-        'price'       => 1000,
-        'condition'   => 3,
-        'image'       => 'dummy.jpg',
-        'status'      => 1,
-    ];
+    {
+        $base = [
+            'user_id'     => $owner->id,
+            'category_id' => $this->categoryId,
+            'name'        => 'ITEM-'.Str::random(5),
+            'brand'       => 'テストブランド',
+            'description' => 'テスト説明',
+            'price'       => 1000,
+            'condition'   => 3,
+            'image'       => 'dummy.jpg',
+            'status'      => 1,
+        ];
 
-    // ❌ $base + $overrides では左側優先のため上書きできない
-    // ⭕ array_merge か array_replace を使う
-    return Item::create(array_merge($base, $overrides));
-    // return Item::create(array_replace($base, $overrides)); でもOK
-}
+        // ❌ $base + $overrides では左側優先のため上書きできない
+        // ⭕ array_merge か array_replace を使う
+        return Item::create(array_merge($base, $overrides));
+        // return Item::create(array_replace($base, $overrides)); でもOK
+    }
 
 
     /** @test */
@@ -82,7 +82,7 @@ class IndexTest extends TestCase
         $me   = $this->makeUser('me');
         $else = $this->makeUser('else');
 
-        $this->makeItem($me,   ['name' => 'MY-ITEM']);
+        $this->makeItem($me, ['name' => 'MY-ITEM']);
         $this->makeItem($else, ['name' => 'OTHER-ITEM']);
 
         $this->actingAs($me);

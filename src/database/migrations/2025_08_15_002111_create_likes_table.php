@@ -26,7 +26,7 @@ class CreateLikesTable extends Migration
         });
     }
 
-    
+
     public function down(): void
     {
         Schema::dropIfExists('likes');

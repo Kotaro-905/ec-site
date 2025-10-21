@@ -80,21 +80,21 @@ class ItemController extends Controller
      * 商品詳細
      */
     public function show(Item $item)
-{
-    $item->load([
-        'category',              // 主カテゴリ
-        'categories',           
-        'comments.user:id,name,image',
-        'likes:id,user_id,item_id',
-    ]);
+    {
+        $item->load([
+            'category',              // 主カテゴリ
+            'categories',
+            'comments.user:id,name,image',
+            'likes:id,user_id,item_id',
+        ]);
 
-    $likesCount = $item->likes->count();
-    $liked = auth()->check()
-        ? $item->likes->contains('user_id', auth()->id())
-        : false;
+        $likesCount = $item->likes->count();
+        $liked = auth()->check()
+            ? $item->likes->contains('user_id', auth()->id())
+            : false;
 
-    return view('items.show', compact('item', 'likesCount', 'liked'));
-}
+        return view('items.show', compact('item', 'likesCount', 'liked'));
+    }
 
     /**
      * いいねのトグル
@@ -118,15 +118,15 @@ class ItemController extends Controller
      */
     public function storeComment(StoreCommentRequest $request, Item $item)
     {
-         // フォームリクエストを使う場合
-         $data = $request->validated();
+        // フォームリクエストを使う場合
+        $data = $request->validated();
 
-         // 万一配列で来ても文字列に
-          $comment = $data['comment'] ?? '';
-         if (is_array($comment)) {
-        $comment = implode('', $comment);
-         }
-          $comment = (string) $comment;
+        // 万一配列で来ても文字列に
+        $comment = $data['comment'] ?? '';
+        if (is_array($comment)) {
+            $comment = implode('', $comment);
+        }
+        $comment = (string) $comment;
 
         \App\Models\Comment::create([
         'user_id' => $request->user()->id,
@@ -134,8 +134,8 @@ class ItemController extends Controller
         'comment' => $comment,
     ]);
 
-    return back(); // 302 が返るのでテストの assertRedirect に一致
-     }
+        return back(); // 302 が返るのでテストの assertRedirect に一致
+    }
 
     /**
      * 出品フォーム

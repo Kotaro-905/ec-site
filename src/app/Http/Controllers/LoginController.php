@@ -14,10 +14,10 @@ class LoginController extends Controller
 
     public function authenticate(LoginRequest $request)
     {
-        
+
         $credentials = $request->only('email', 'password');
 
-        if (Auth::attempt($request->only('email','password'), true)) {
+        if (Auth::attempt($request->only('email', 'password'), true)) {
             $request->session()->regenerate();
 
             // まだメール認証していない場合は誘導ページへ

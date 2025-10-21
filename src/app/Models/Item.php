@@ -91,7 +91,7 @@ class Item extends Model
 
     // 状態ラベル
     public const CONDITION_LABELS = [
-        
+
         1 => '良好',
         2 => '目立った傷や汚れなし',
         3 => 'やや傷や汚れあり',
@@ -107,7 +107,7 @@ class Item extends Model
     public const STATUS_ONSALE = 1;  // 出品中
     public const STATUS_SOLD   = 2;  // 売り切れ
 
-    
+
 
     // モデル生成時のデフォルト値（マイグレーションを触らずに「出品中」を既定にしたいとき）
     protected $attributes = [

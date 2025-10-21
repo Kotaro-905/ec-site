@@ -11,7 +11,6 @@ use App\Http\Responses\LogoutResponse;
 use Laravel\Fortify\Contracts\LogoutResponse as LogoutResponseContract;
 use Laravel\Fortify\Fortify;
 use Illuminate\Support\Facades\Redirect;
-
 use App\Actions\Fortify\CreateNewUser;
 
 class FortifyServiceProvider extends ServiceProvider
@@ -21,7 +20,7 @@ class FortifyServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        $this->app->singleton(LoginResponse::class,    CustomLoginResponse::class);
+        $this->app->singleton(LoginResponse::class, CustomLoginResponse::class);
         $this->app->singleton(LogoutResponseContract::class, LogoutResponse::class);
     }
 
@@ -51,15 +50,15 @@ class FortifyServiceProvider extends ServiceProvider
             return view('auth.reset-password', ['request' => $request]);
         });
 
-       
+
         $this->app->singleton(RegisterResponse::class, function () {
-        return new class implements RegisterResponse {
-            public function toResponse($request)
-            {
-                return redirect()->route('verification.notice');
-            }
-        };
-    });
+            return new class () implements RegisterResponse {
+                public function toResponse($request)
+                {
+                    return redirect()->route('verification.notice');
+                }
+            };
+        });
     }
 
 }

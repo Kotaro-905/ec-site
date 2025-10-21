@@ -13,16 +13,16 @@ class ItemFactory extends Factory
 
     public function definition()
     {
-       return [
-        'user_id'     => User::factory(),
-        'category_id' => Category::factory(),
-        'name'        => $this->faker->word,
-        'brand'       => $this->faker->company, // ← ここが必須
-        'description' => $this->faker->sentence,
-        'price'       => $this->faker->numberBetween(100, 10000),
-        'condition'   => 3,
-        'image'       => null,
-        'status'      => 1,
+        return [
+         'user_id'     => User::factory(),
+         'category_id' => Category::factory(),
+         'name'        => $this->faker->word,
+         'brand'       => $this->faker->company, // ← ここが必須
+         'description' => $this->faker->sentence,
+         'price'       => $this->faker->numberBetween(100, 10000),
+         'condition'   => 3,
+         'image'       => null,
+         'status'      => 1,
     ];
     }
 }

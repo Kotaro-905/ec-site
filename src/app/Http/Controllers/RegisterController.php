@@ -25,21 +25,21 @@ class RegisterController extends Controller
         ]);
 
         event(new Registered($user));
-        
+
         Auth::login($user);
 
-        
+
         return redirect()->route('verification.notice');
     }
 
     protected function registered(Request $request, $user)
-{
-    // 未認証ユーザーを「メール認証のお願い」画面へ誘導
-    if (! $user->hasVerifiedEmail()) {
-        return redirect()->route('verification.notice');
-    }
+    {
+        // 未認証ユーザーを「メール認証のお願い」画面へ誘導
+        if (! $user->hasVerifiedEmail()) {
+            return redirect()->route('verification.notice');
+        }
 
-    // 認証済み（再登録など）なら通常ホームへ
-    return redirect()->route('items.index');
-}
+        // 認証済み（再登録など）なら通常ホームへ
+        return redirect()->route('items.index');
+    }
 }

@@ -92,4 +92,3 @@ class RegisterTest extends TestCase
         $this->assertAuthenticated();
     }
 }
-

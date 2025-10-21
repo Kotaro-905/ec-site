@@ -11,12 +11,12 @@ class AddRememberTokenToUsersTable extends Migration
      *
      * @return void
      */
-   public function up()
-{
-    Schema::table('users', function (Blueprint $table) {
-        $table->rememberToken()->after('password')->nullable();
-    });
-}
+    public function up()
+    {
+        Schema::table('users', function (Blueprint $table) {
+            $table->rememberToken()->after('password')->nullable();
+        });
+    }
 
     /**
      * Reverse the migrations.
@@ -24,10 +24,10 @@ class AddRememberTokenToUsersTable extends Migration
      * @return void
      */
     public function down()
-{
-    Schema::table('users', function (Blueprint $table) {
-        $table->dropColumn('remember_token');
-    });
-}
+    {
+        Schema::table('users', function (Blueprint $table) {
+            $table->dropColumn('remember_token');
+        });
+    }
 
 }

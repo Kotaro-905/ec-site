@@ -27,36 +27,29 @@
 
         {{-- 右：情報 --}}
         <div class="show__info">
-            <h1 class="show__title">{{ $item->name }}</h1>
-            <div class="show__brand">{{ $item->brand ?? 'ブランド名' }}</div>
-            <div class="show__price">¥{{ number_format($item->price ?? 0) }} <small>(税込)</small></div>
+        <h1 class="show__title">{{ $item->name }}</h1>
+         <div class="show__brand">{{ $item->brand ?? 'ブランド名' }}</div>
+         <div class="show__price">¥{{ number_format($item->price ?? 0) }} <small>(税込)</small></div>
 
-            {{-- 送信後メッセージ（任意） --}}
-            @if (session('status'))
-                <div class="flash">{{ session('status') }}</div>
-            @endif
+         {{-- いいね＋コメント数（※今あるものをこのブロックにまとめる） --}}
+           <div class="item-stats">
+            <form method="POST" action="{{ route('items.like', $item) }}">
+            @csrf
+              <button type="submit" class="stat__icon {{ $liked ? 'is-liked' : '' }}" aria-label="like">
+        {{ $liked ? '★' : '☆' }}
+           </button>
+              <div class="stat__num">{{ $likesCount }}</div>
+          </form>
 
-            <div class="show__actions">
-             <div class="item-stats">
-               {{-- いいね --}}
-                <form method="POST" action="{{ route('items.like', $item) }}" class="stat">
-                @csrf
-                <button type="submit" class="stat__icon {{ $liked ? 'is-liked' : '' }}">
-                   {{ $liked ? '★' : '☆' }}
-                   </button>
-                    <span class="stat__num">{{ $likesCount }}</span>
-                   </form>
+            <div class="stat">
+              <button class="stat__icon" type="button" aria-disabled="true">💬</button>
+            <div class="stat__num">{{ $item->comments->count() }}</div>
+            </div>
+            </div>
 
-                 {{-- コメント数 --}}
-                   <div class="stat">
-                   <span class="stat__icon">💬</span>
-                  <span class="stat__num">{{ $item->comments->count() }}</span>
-                   </div>
-                   </div>
-        
-             {{-- 購入ボタン --}}
-           <a href="{{ route('purchase.create', $item) }}" class="buy-btn">購入手続きへ</a>
-        </div>
+  {{-- ★ 商品説明の“直前”に購入ボタン（フル幅） --}}
+  <a class="main-btn" href="{{ route('purchase.create', $item) }}">購入手続きへ</a>
+
 
             {{-- 商品説明 --}}
             <h2 class="sec">商品説明</h2>
@@ -124,7 +117,7 @@
                         <p class="invalid-feedback">{{ $message }}</p>
                     @enderror
 
-                    <button type="submit" class="cmt-submit">コメントを送信する</button>
+                    <button type="submit" class="main-btn cmt-submit">コメントを送信する</button>
                 </form>
             </div>
             @else
