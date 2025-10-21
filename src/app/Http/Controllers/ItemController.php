@@ -34,9 +34,7 @@ class ItemController extends Controller
         // 検索条件（OR 検索は () でグルーピング）
         if ($q !== '') {
             $items->where(function ($qq) use ($q) {
-                $qq->where('name', 'like', "%{$q}%")
-                   ->orWhere('brand', 'like', "%{$q}%")
-                   ->orWhere('description', 'like', "%{$q}%");
+                $qq->where('name', 'like', "%{$q}%");
             });
         }
 
