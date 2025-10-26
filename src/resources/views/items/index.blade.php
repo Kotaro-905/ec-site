@@ -16,15 +16,14 @@
     おすすめ
   </a>
 
+  @auth
   <a href="{{ route('items.index', ['tab' => 'mylist'] + request()->only('q')) }}"
      class="items__tab {{ $tab==='mylist' ? 'is-active' : '' }}">
     マイリスト
   </a>
-</div>
+  @endauth
 
-    @if($tab==='mylist' && !auth()->check())
-    <p class="items__note">…ログインするとマイリストが見られます。</p>
-    @endif
+</div>
 
     <div class="items__grid">
         @forelse($items as $item)

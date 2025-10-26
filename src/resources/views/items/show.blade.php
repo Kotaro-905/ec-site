@@ -48,8 +48,18 @@
             </div>
 
   {{-- ★ 商品説明の“直前”に購入ボタン（フル幅） --}}
-  <a class="main-btn" href="{{ route('purchase.create', $item) }}">購入手続きへ</a>
-
+            @php
+             // 出品者自身、または既に購入済み（orderItemsが存在）なら購入不可にする
+             $isOwner = auth()->check() && auth()->id() === $item->user_id;
+             $isSold  = $item->orderItems->isNotEmpty();
+           @endphp
+           @if($isSold)
+             <button class="main-btn is-sold" type="button" disabled aria-disabled="true">売り切れました</button>
+           @elseif($isOwner)
+             <button class="main-btn" type="button" disabled aria-disabled="true">購入できません</button>
+           @else
+             <a class="main-btn" href="{{ route('purchase.create', $item) }}">購入手続きへ</a>
+           @endif
 
             {{-- 商品説明 --}}
             <h2 class="sec">商品説明</h2>
@@ -121,9 +131,13 @@
                 </form>
             </div>
             @else
-            <p class="muted">コメントするにはログインしてください。</p>
+            <div class="cmt-form">
+                {{-- ゲスト向け：ログインページへ（ログイン後に元ページへ戻すため redirect クエリを付与） --}}
+                <a href="{{ route('login', ['redirect' => url()->full()]) }}" class="main-btn cmt-submit">
+                    ログインしてコメントする
+                </a>
+            </div>
             @endauth
-
         </div>
     </div>
 </div>
