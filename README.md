@@ -5,8 +5,8 @@
 
 ## Dockerビルド
 <ul>
-　<li>1.origin  git@github.com:Kotaro-905/form-test.git</li>
-  <li>2.ug docker-compose up -d --build</li>
+　<li>1.git@github.com:Kotaro-905/ec-site.git</li>
+  <li>2.docker-compose up -d --build</li>
   </ul>
 
 ※MySQLは、OSによって起動しない場合があるのでそれぞれのPCに合わせてdocker-compose.ymlファイルを編集してください
@@ -29,6 +29,11 @@
   <li>Docker（開発環境</li>
   <li>Laravel Fortify（認証機能</li>
   <li>HTML/CSS（クラスベースのスタイリング</li>
+</ul>
+
+## 補足
+<ul>
+<li>鈴木北斗コーチから、機能要件 FN012 の通りメール認証画面から商品一覧画面に遷移するようにお聞きしています。Figmaとは導線が異なります機能要件を優先しています。</li>
 </ul>
 
 ## URL
