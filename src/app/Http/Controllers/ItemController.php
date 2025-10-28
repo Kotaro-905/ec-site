@@ -8,6 +8,7 @@ use App\Models\Comment;
 use App\Models\Like;
 use App\Http\Requests\StoreCommentRequest;
 use Illuminate\Http\Request;
+use App\Http\Requests\ExhibitionRequest;
 
 class ItemController extends Controller
 {
@@ -156,27 +157,23 @@ class ItemController extends Controller
     /**
      * 出品登録
      */
-    public function store(Request $request)
+    public function store(ExhibitionRequest $request)
     {
-        $validated = $request->validate([
-            'image'        => ['nullable', 'image', 'max:4096'],
-            'name'         => ['required', 'string', 'max:100'],
-            'brand'        => ['nullable', 'string', 'max:100'],
-            'description'  => ['nullable', 'string', 'max:2000'],
-            'price'        => ['required', 'integer', 'min:1', 'max:99999999'],
-            'condition'    => ['required', 'integer', 'between:1,5'],
-            'category_id'  => ['nullable', 'integer', 'exists:categories,id'],
-        ]);
+        $v = $request->validated();
 
         $item = new Item();
         $item->user_id     = $request->user()->id;
-        $item->name        = $validated['name'];
-        $item->brand       = $validated['brand'] ?? null;
-        $item->description = $validated['description'] ?? null;
-        $item->price       = $validated['price'];
-        $item->condition   = $validated['condition'];
-        $item->category_id = $validated['category_id'] ?? 1;
-        $item->status      = 1; // 公開
+        $item->name        = $v['name'];
+        $item->brand       = $v['brand'] ?? '';
+        $item->description = $v['description'];
+        $item->price       = $v['price'];
+        $item->condition   = $v['condition'];
+
+        // 主カテゴリ：選択された最初の1件を採用
+        $catIds = collect($v['categories'])->map(fn ($id) => (int)$id)->unique()->values();
+        $item->category_id = $catIds->first();
+
+        $item->status = 1;
 
         if ($request->hasFile('image')) {
             $item->image = $request->file('image')->store('items', 'public');
@@ -184,8 +181,11 @@ class ItemController extends Controller
 
         $item->save();
 
-        return redirect()
-            ->route('profile.show')
-            ->with('status', '出品しました。');
+        // 多対多（item_categories）も使っている場合
+        if (method_exists($item, 'categories')) {
+            $item->categories()->sync($catIds);
+        }
+
+        return redirect()->route('profile.show')->with('status', '出品しました。');
     }
 }

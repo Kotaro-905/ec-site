@@ -161,3 +161,16 @@
 .sell__submit:hover {
     filter: brightness(.95);
 }
+
+.hint {
+    color: #ef4444;
+    font-size: 13px;
+    margin-top: 6px;
+}
+
+.sell__input.is-invalid,
+.sell__textarea.is-invalid,
+.sell__select.is-invalid {
+    border-color: #f87171;
+    background: #fef2f2;
+}

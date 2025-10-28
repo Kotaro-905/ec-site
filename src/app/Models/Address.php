@@ -28,6 +28,14 @@ class Address extends Model
         'building',
     ];
 
+    public function getPostalCodeHyphenAttribute(): string
+    {
+        $num = preg_replace('/\D/', '', (string) $this->postal_code);
+        return preg_match('/^\d{7}$/', $num)
+            ? substr($num, 0, 3) . '-' . substr($num, 3)
+            : (string) $this->postal_code;
+    }
+
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);

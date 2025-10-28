@@ -24,29 +24,36 @@
         </div>
 
         <div class="field">
-            <label class="label" for="name">ユーザー名</label>
-            <input class="input" id="name" name="name" type="text"
-                value="{{ old('name', $user->name) }}">
-        </div>
+  <label class="label" for="name">ユーザー名</label>
+  <input class="input" id="name" name="name" type="text" value="{{ old('name', $user->name) }}">
+  @error('name')<div class="hint">{{ $message }}</div>@enderror
+</div>
 
-        <div class="field">
-            <label class="label" for="postal_code">郵便番号</label>
-            <input class="input" id="postal_code" name="postal_code" type="text"
-                value="{{ old('postal_code', $user->address->postal_code ?? '') }}">
-        </div>
+<div class="field">
+  <label class="label" for="postal_code">郵便番号</label>
+  <input class="input" id="postal_code" name="postal_code" type="text"
+         value="{{ old('postal_code', $user->address->postal_code ?? '') }}">
+  @error('postal_code')<div class="hint">{{ $message }}</div>@enderror
+</div>
 
-        <div class="field">
-            <label class="label" for="address">住所</label>
-            <input class="input" id="address" name="address" type="text"
-                value="{{ old('address', $user->address->address ?? '') }}">
-        </div>
+<div class="field">
+  <label class="label" for="address">住所</label>
+  <input class="input" id="address" name="address" type="text"
+         value="{{ old('address', $user->address->address ?? '') }}">
+  @error('address')<div class="hint">{{ $message }}</div>@enderror
+</div>
 
-        <div class="field">
-            <label class="label" for="building">建物名</label>
-            <input class="input" id="building" name="building" type="text"
-                value="{{ old('building', $user->address->building ?? '') }}">
-        </div>
+<div class="field">
+  <label class="label" for="building">建物名</label>
+  <input class="input" id="building" name="building" type="text"
+         value="{{ old('building', $user->address->building ?? '') }}">
+  @error('building')<div class="hint">{{ $message }}</div>@enderror
+</div>
 
+<div class="avatar">
+
+  @error('image')<div class="hint">{{ $message }}</div>@enderror
+</div>
         <div class="actions">
             <button class="btn-primary" type="submit">更新する</button>
         </div>

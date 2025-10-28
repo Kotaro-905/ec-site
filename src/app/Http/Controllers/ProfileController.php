@@ -9,6 +9,8 @@ use Illuminate\Support\Facades\Storage;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use App\Http\Requests\ProfileRequest;
+use Symfony\Component\HttpKernel\Profiler\Profile;
 
 class ProfileController extends Controller
 {
@@ -26,17 +28,9 @@ class ProfileController extends Controller
     }
 
     /** 更新処理 */
-    public function update(Request $request)
+    public function update(ProfileRequest $request)
     {
-        $request->validate([
-            'name'        => ['required', 'string', 'max:255'],
-            // 画像は最大 4MB / 画像ファイルのみ
-            'image'       => ['nullable', 'image', 'max:4096', 'mimes:jpeg,png,jpg,gif,webp'],
-            'postal_code' => ['nullable', 'string', 'max:16'],
-            'address'     => ['nullable', 'string', 'max:255'],
-            'building'    => ['nullable', 'string', 'max:255'],
-        ]);
-
+        $request->validated();
         $user = $request->user();
 
         DB::transaction(function () use ($request, $user) {
@@ -78,11 +72,13 @@ class ProfileController extends Controller
             // ハイフン・空白を除去（数値だけに寄せる）
             $postal = is_string($postal) ? preg_replace('/[\s\-]/', '', $postal) : null;
 
+            $data = $request->validated();
+
             Address::updateOrCreate(
                 ['user_id' => $user->id],
                 [
-                    'postal_code' => $postal,
-                    'address'     => $request->input('address'),
+                    'postal_code' => $data['postal_code'],
+                    'address'     => $data['address'],
                     'building'    => $request->input('building'),
                 ]
             );

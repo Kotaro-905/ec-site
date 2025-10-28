@@ -8,6 +8,8 @@ use App\Models\Address;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\OrderItem;
+use App\Http\Requests\PurchaseRequest;
+use App\Http\Requests\AddressRequest;
 
 class PurchaseController extends Controller
 {
@@ -39,11 +41,10 @@ class PurchaseController extends Controller
     }
 
     /** 購入実行（Stripe Checkout セッション作成 → リダイレクト） */
-    public function checkout(Request $request, Item $item)
+    public function checkout(PurchaseRequest $request, Item $item)
     {
-        $data = $request->validate([
-            'payment_method' => ['required', 'in:card,konbini'],
-        ]);
+        $data = $request->validated();
+        $method = $data['payment_method'];
 
         $stripe = new \Stripe\StripeClient(config('services.stripe.secret'));
 
@@ -145,31 +146,22 @@ class PurchaseController extends Controller
     }
 
     /** 配送先住所の更新（購入フロー用） */
-    public function updateAddress(Request $request, Item $item)
+    public function updateAddress(AddressRequest $request, Item $item)
     {
-        $validated = $request->validate([
-            'postal_code' => ['nullable', 'string', 'max:16'],
-            'address'     => ['nullable', 'string', 'max:255'],
-            'building'    => ['nullable', 'string', 'max:255'],
-        ]);
-
-        // 郵便番号の-除去
-        if (isset($validated['postal_code'])) {
-            $validated['postal_code'] = str_replace('-', '', $validated['postal_code']);
-        }
+        $data = $request->validated(); // postal_code, address は必須
+        // building は任意（未入力なら null）
+        $building = $request->filled('building') ? $request->input('building') : null;
 
         Address::updateOrCreate(
             ['user_id' => $request->user()->id],
             [
-                'postal_code' => $validated['postal_code'] ?? null,
-                'address'     => $validated['address'] ?? null,
-                'building'    => $validated['building'] ?? null,
+                'postal_code' => $data['postal_code'], // ハイフンそのまま
+                'address'     => $data['address'],
+                'building'    => $building,
             ]
         );
 
-        // 元の購入画面に戻る
-        return redirect()
-            ->route('purchase.create', $item)
-            ->with('status', '配送先住所を更新しました。');
+        return redirect()->route('purchase.create', $item)
+                         ->with('status', '配送先住所を更新しました。');
     }
 }

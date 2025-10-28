@@ -222,6 +222,19 @@ a {
     border: 0;
 }
 
+
+.hint {
+    color: #ef4444;
+    /* 赤文字 */
+    font-size: 13px;
+    margin-top: 6px;
+}
+
+.input.is-invalid {
+    border-color: #f87171;
+    background: #fef2f2;
+}
+
 /* ====== Responsive ====== */
 @media (max-width: 640px) {
     .header__inner {
