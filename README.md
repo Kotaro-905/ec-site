@@ -69,6 +69,11 @@ php artisan migrate:fresh --env=testing
 
 ### 3. php artisan testで全テスト実行。
 
+```bash
+docker-compose exec php bash
+php artisan test
+```
+
 ---
 
 ## 補足
