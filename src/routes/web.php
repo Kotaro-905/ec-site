@@ -21,8 +21,14 @@ Route::post('/register', [RegisterController::class, 'create'])->name('register.
 Route::get('/login', [LoginController::class, 'show'])->name('login');
 Route::post('/login', [LoginController::class, 'authenticate'])->name('login');
 
-//商品一覧
-Route::get('/items', [ItemController::class, 'index'])->name('items.index');
+// 商品一覧（トップを商品一覧にする）
+Route::get('/', [ItemController::class, 'index'])->name('items.index');
+
+// 互換性のため /items へ来たらトップへリダイレクト
+Route::get('/items', function () {
+    return redirect()->route('items.index');
+});
+
 //検索機能
 Route::get('/search', [ItemController::class, 'search'])->name('items.search');
 
@@ -43,14 +49,14 @@ Route::get('/verification/check', [VerificationController::class, 'check'])
 
 // 3) 「認証する」押下 → 署名付きURLを作り、本家 verify に飛ばす
 Route::post('/email/verify/perform', [EmailConfirmController::class, 'perform'])
-    ->middleware(['auth','throttle:6,1'])
+    ->middleware(['auth', 'throttle:6,1'])
     ->name('verification.perform');
 
 // 4) 本家 verify（Laravel標準）: 認証完了後に商品一覧へ
 Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $request) {
     $request->fulfill();
     return redirect()->route('items.index');
-})->middleware(['auth','signed'])->name('verification.verify');
+})->middleware(['auth', 'signed'])->name('verification.verify');
 
 // 5) 認証メール「再送」… コントローラ不要（クロージャ）
 Route::post('/email/verification-notification', function (Request $request) {
@@ -66,17 +72,24 @@ Route::post('/email/verification-notification', function (Request $request) {
 
 //認証が必要な画面をこの中に（後で追加していく）
 Route::middleware('auth')->group(function () {
-    Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::get('/mypage', [ProfileController::class, 'show'])->name('profile.show');
+    Route::get('/mypage/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::put('/mypage/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::get('/profile', function () {
+        return redirect()->route('profile.show');
+    });
 
-    // ← これを items/{item} より“前”に置く
-    Route::get('/items/create', [ItemController::class, 'create'])->name('items.create');
-    Route::post('/items', [ItemController::class, 'store'])->name('items.store');
+    Route::get('/sell', [ItemController::class, 'create'])->name('items.create');
+    Route::post('/sell', [ItemController::class, 'store'])->name('items.store');
+    Route::get('/items/create', function () {
+        return redirect()->route('items.create');
+    });
 
     Route::post('/items/{item}/like', [ItemController::class, 'toggleLike'])->name('items.like');
     Route::post('/items/{item}/comments', [ItemController::class, 'storeComment'])->name('items.comments.store');
 
-    Route::get('/profile', [ProfileController::class, 'show'])->name('profile.show');
+    Route::get('/mypage', [ProfileController::class, 'show'])->name('profile.show');
+    Route::get('/profile', fn() => redirect()->route('profile.show'));
 
     Route::get('/items/{item}/buy', [PurchaseController::class, 'create'])->name('purchase.create');
     Route::post('/items/{item}/buy', [PurchaseController::class, 'store'])->name('purchase.store');
@@ -92,11 +105,26 @@ Route::middleware('auth')->group(function () {
         ->where('item', '[0-9]+')
         ->name('purchase.create');
 
-    Route::get('/purchase/{item}/address', [PurchaseController::class, 'editAddress'])->name('purchase.address.edit');
-    Route::put('/purchase/{item}/address', [PurchaseController::class, 'updateAddress'])->name('purchase.address.update');
+    Route::get('/purchase/address/{item}', [PurchaseController::class, 'editAddress'])
+        ->whereNumber('item')
+        ->name('purchase.address.edit');
+
+    Route::put('/purchase/address/{item}', [PurchaseController::class, 'updateAddress'])
+        ->whereNumber('item')
+        ->name('purchase.address.update');
+
+
+    Route::get('/purchase/{item}/address', function ($item) {
+        return redirect()->route('purchase.address.edit', $item);
+    })->whereNumber('item');
 });
 
 // ★ 商品詳細は“最後”に置く + 数値IDだけ許可
-Route::get('/items/{item}', [ItemController::class, 'show'])
+Route::get('/items/{item}', function ($item) {
+    return redirect()->route('items.show', $item);
+})->whereNumber('item');
+
+
+Route::get('/item/{item}', [ItemController::class, 'show'])
     ->whereNumber('item')
     ->name('items.show');

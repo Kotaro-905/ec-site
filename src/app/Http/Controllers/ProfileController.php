@@ -50,7 +50,8 @@ class ProfileController extends Controller
                 $newPath = $file->storeAs('avatars', $filename, 'public');
 
                 // 以前の画像があれば削除（自分の avatars/ のみ）
-                if ($user->image
+                if (
+                    $user->image
                     && Str::startsWith($user->image, 'avatars/')
                     && Storage::disk('public')->exists($user->image)
                 ) {
@@ -86,20 +87,22 @@ class ProfileController extends Controller
     public function show(Request $request)
     {
         $user = $request->user();
-        $tab  = $request->query('tab', 'listed');
 
-        // 出品した商品
+        // ?page=sell|buy（デフォルトは sell）
+        $page = $request->query('page', 'sell');
+
+        // 出品した商品（sell）
         $listedItems = Item::select('id', 'name', 'image', 'price', 'status')
             ->where('user_id', $user->id)
             ->latest()
             ->get();
 
-        // 購入した商品
+        // 購入した商品（buy）
         $purchasedIds = DB::table('order_items')
             ->where('user_id', $user->id)
             ->orderByDesc('created_at')
             ->pluck('item_id')
-            ->map(fn ($v) => (int) $v)
+            ->map(fn($v) => (int) $v)
             ->values();
 
         if ($purchasedIds->isNotEmpty()) {
@@ -108,15 +111,15 @@ class ProfileController extends Controller
 
             $purchasedItems = Item::query()
                 ->whereIn('id', $idArray)
-                ->when($csv !== '', fn ($q) => $q->orderByRaw("FIELD(id, {$csv})"))
-                ->get(['id','name','image','price','status']);
+                ->when($csv !== '', fn($q) => $q->orderByRaw("FIELD(id, {$csv})"))
+                ->get(['id', 'name', 'image', 'price', 'status']);
         } else {
             $purchasedItems = collect();
         }
 
         return view('profile.show', [
             'user'           => $user,
-            'tab'            => $tab,
+            'page'           => $page,         // ← ここを渡す
             'listedItems'    => $listedItems,
             'purchasedItems' => $purchasedItems,
         ]);

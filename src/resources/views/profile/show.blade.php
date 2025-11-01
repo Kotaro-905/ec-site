@@ -9,13 +9,13 @@
 
 @section('content')
 @php
-$tab = $tab ?? request('tab', 'listed');
+// ?page=sell|buy（デフォルトは sell）
+$page = $page ?? request('page', 'sell');
 @endphp
 
 <div class="profile">
   <div class="profile__header">
     <div class="profile__avatar">
-      {{-- ▼ ここだけ置き換え --}}
       <img
         src="{{ $user->image ? asset('storage/'.$user->image) : asset('images/default-avatar.png') }}"
         alt="プロフィール画像"
@@ -30,14 +30,14 @@ $tab = $tab ?? request('tab', 'listed');
   </div>
 
   <div class="profile__tabs">
-    <a href="{{ route('profile.show', ['tab' => 'listed'], false) }}"
-      class="tab {{ $tab === 'listed' ? 'is-active' : '' }}">出品した商品</a>
-    <a href="{{ route('profile.show', ['tab' => 'purchased'], false) }}"
-      class="tab {{ $tab === 'purchased' ? 'is-active' : '' }}">購入した商品</a>
+    <a href="{{ route('profile.show', ['page' => 'sell'], false) }}"
+      class="tab {{ $page === 'sell' ? 'is-active' : '' }}">出品した商品</a>
+    <a href="{{ route('profile.show', ['page' => 'buy'], false) }}"
+      class="tab {{ $page === 'buy' ? 'is-active' : '' }}">購入した商品</a>
   </div>
 
   <div class="items__grid">
-    @if ($tab === 'listed')
+    @if ($page === 'sell')
     @forelse ($listedItems as $item)
     @include('partials.item-card', ['item' => $item])
     @empty
