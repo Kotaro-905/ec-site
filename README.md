@@ -72,7 +72,7 @@ php artisan migrate:fresh --env=testing
 > * `--env=testing` オプションにより、`.env.testing` の設定が使用されます。
 > * 既存テーブルをすべて削除して再構築する場合に `migrate:fresh` を使用します。
 
-php artisan testで全テスト実行。
+### 3. php artisan testで全テスト実行。
 
 ---
 
