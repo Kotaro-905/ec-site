@@ -22,7 +22,7 @@ services:
         build: ./docker/php
         volumes:
             - ./src:/var/www/
-        
+        user: "${UID_GID}"
 
     mysql:
         image: mysql:8.0.26
