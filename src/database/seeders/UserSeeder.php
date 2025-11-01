@@ -25,11 +25,12 @@ class UserSeeder extends Seeder
             DB::table('users')->updateOrInsert(
                 ['email' => $u['email']],
                 [
-                    'name'       => $u['name'],
-                    'email'      => $u['email'],
-                    'password'   => Hash::make($u['password']),
-                    'created_at' => $now,
-                    'updated_at' => $now,
+                    'name'              => $u['name'],
+                    'email'             => $u['email'],
+                    'password'          => Hash::make($u['password']),
+                    'email_verified_at' => $now,   // ★ 認証済み
+                    'created_at'        => $now,
+                    'updated_at'        => $now,
                 ]
             );
         }
