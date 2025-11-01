@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Item;
+use App\Http\Requests\ExhibitionRequest;
+use App\Http\Requests\StoreCommentRequest;
 use App\Models\Category;
 use App\Models\Comment;
+use App\Models\Item;
 use App\Models\Like;
-use App\Http\Requests\StoreCommentRequest;
 use Illuminate\Http\Request;
-use App\Http\Requests\ExhibitionRequest;
 
 class ItemController extends Controller
 {
@@ -28,7 +28,7 @@ class ItemController extends Controller
         if ($tab !== 'mylist' && auth()->check()) {
             $items->where(function ($q2) {
                 $q2->whereNull('items.user_id')
-                   ->orWhere('items.user_id', '<>', auth()->id());
+                    ->orWhere('items.user_id', '<>', auth()->id());
             });
         }
 
@@ -88,7 +88,7 @@ class ItemController extends Controller
         ]);
 
         $likesCount = $item->likes->count();
-        $liked = auth()->check()
+        $liked      = auth()->check()
             ? $item->likes->contains('user_id', auth()->id())
             : false;
 
@@ -127,11 +127,11 @@ class ItemController extends Controller
         }
         $comment = (string) $comment;
 
-        \App\Models\Comment::create([
-        'user_id' => $request->user()->id,
-        'item_id' => $item->id,
-        'comment' => $comment,
-    ]);
+        Comment::create([
+            'user_id' => $request->user()->id,
+            'item_id' => $item->id,
+            'comment' => $comment,
+        ]);
 
         return back(); // 302 が返るのでテストの assertRedirect に一致
     }
@@ -161,7 +161,7 @@ class ItemController extends Controller
     {
         $v = $request->validated();
 
-        $item = new Item();
+        $item              = new Item();
         $item->user_id     = $request->user()->id;
         $item->name        = $v['name'];
         $item->brand       = $v['brand'];
@@ -170,7 +170,7 @@ class ItemController extends Controller
         $item->condition   = $v['condition'];
 
         // 主カテゴリ：選択された最初の1件を採用
-        $catIds = collect($v['categories'])->map(fn ($id) => (int)$id)->unique()->values();
+        $catIds            = collect($v['categories'])->map(fn ($id) => (int)$id)->unique()->values();
         $item->category_id = $catIds->first();
 
         $item->status = 1;

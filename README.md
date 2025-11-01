@@ -88,7 +88,5 @@ php artisan migrate:fresh --env=testing
 * 開発環境: [http://localhost/](http://localhost/)
 * phpMyAdmin: [http://localhost:8080](http://localhost:8080/index.php?route=/database/structure&db=information_schema)
 
-
-
 ## ER図
-[ER図](https://github.com/user-attachments/assets/24b008ed-020b-4050-8cfb-389ac703e4a9)
+![alt](.drawio.png)

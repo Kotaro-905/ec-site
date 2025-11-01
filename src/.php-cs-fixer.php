@@ -37,4 +37,5 @@ return (new PhpCsFixer\Config())
         'single_quote' => true,
         'trailing_comma_in_multiline' => ['elements' => ['arrays']],
         'yoda_style' => false,
+        'no_extra_blank_lines' => ['tokens' => ['extra', 'curly_brace_block']],
     ]);

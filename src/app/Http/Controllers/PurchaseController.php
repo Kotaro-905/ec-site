@@ -2,14 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Item;
-use Illuminate\Support\Facades\DB;
+use App\Http\Requests\AddressRequest;
+use App\Http\Requests\PurchaseRequest;
 use App\Models\Address;
+use App\Models\Item;
+use App\Models\OrderItem;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use App\Models\OrderItem;
-use App\Http\Requests\PurchaseRequest;
-use App\Http\Requests\AddressRequest;
+use Illuminate\Support\Facades\DB;
 
 class PurchaseController extends Controller
 {
@@ -32,7 +32,6 @@ class PurchaseController extends Controller
         $user    = Auth::user();
         $address = $user?->address;
 
-
         return view('purchase.create', [
             'item'    => $item,
             'user'    => $user,
@@ -43,31 +42,30 @@ class PurchaseController extends Controller
     /** 購入実行（Stripe Checkout セッション作成 → リダイレクト） */
     public function checkout(PurchaseRequest $request, Item $item)
     {
-        $data = $request->validated();
+        $data   = $request->validated();
         $method = $data['payment_method'];
 
         $stripe = new \Stripe\StripeClient(config('services.stripe.secret'));
 
         // Sinatra の YOUR_DOMAIN に相当（実行中のホスト＋ポートを使う）
-        $origin = $request->getSchemeAndHttpHost();
+        $origin     = $request->getSchemeAndHttpHost();
         $successUrl = $origin . route('purchase.success', [], false) . '?session_id={CHECKOUT_SESSION_ID}';
         $cancelUrl  = $origin . route('purchase.cancel', [], false);
 
-
         $session = $stripe->checkout->sessions->create([
-            'mode' => 'payment',
+            'mode'                 => 'payment',
             'payment_method_types' => [$data['payment_method']], // 'card' | 'konbini'
-            'line_items' => [[
+            'line_items'           => [[
                 'price_data' => [
-                    'currency'    => 'jpy',
-                    'unit_amount' => (int) $item->price,
+                    'currency'     => 'jpy',
+                    'unit_amount'  => (int) $item->price,
                     'product_data' => ['name' => $item->name],
                 ],
                 'quantity' => 1,
             ]],
             'success_url' => $successUrl,
             'cancel_url'  => $cancelUrl,
-            'metadata' => [
+            'metadata'    => [
                 'item_id' => (string) $item->id,
                 'user_id' => (string) (auth()->id() ?? 0),
                 'method'  => $data['payment_method'],
@@ -130,7 +128,6 @@ class PurchaseController extends Controller
     {
         return redirect()->route('items.index')->with('status', '購入処理をキャンセルしました。');
     }
-
 
     /** 配送先住所の編集画面（購入フロー用） */
     public function editAddress(Item $item)

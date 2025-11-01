@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\ProfileRequest;
 use App\Models\Address;
 use App\Models\Item;
 use App\Models\User;
@@ -9,7 +10,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
-use App\Http\Requests\ProfileRequest;
 
 class ProfileController extends Controller
 {
@@ -70,7 +70,7 @@ class ProfileController extends Controller
                     'postal_code' => $data['postal_code'],
                     'address'     => $data['address'],
                     // 建物名は任意：未入力なら null を保存（DB 側は nullable に変更済み）
-                    'building'    => $request->filled('building') ? $request->input('building') : null,
+                    'building' => $request->filled('building') ? $request->input('building') : null,
                 ]
             );
         });
@@ -108,7 +108,7 @@ class ProfileController extends Controller
 
             $purchasedItems = Item::query()
                 ->whereIn('id', $idArray)
-                ->when($csv !== '', fn ($q) => $q->orderByRaw("FIELD(id, $csv)"))
+                ->when($csv !== '', fn ($q) => $q->orderByRaw("FIELD(id, {$csv})"))
                 ->get(['id','name','image','price','status']);
         } else {
             $purchasedItems = collect();
