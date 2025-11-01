@@ -3,13 +3,13 @@
 @section('title', 'プロフィール')
 
 @section('css')
-  <link rel="stylesheet" href="{{ asset('css/items-index.css') }}">
-  <link rel="stylesheet" href="{{ asset('css/profile.css') }}">
+<link rel="stylesheet" href="{{ asset('css/items-index.css') }}">
+<link rel="stylesheet" href="{{ asset('css/profile.css') }}">
 @endsection
 
 @section('content')
 @php
-    $tab = $tab ?? request('tab', 'listed');
+$tab = $tab ?? request('tab', 'listed');
 @endphp
 
 <div class="profile">
@@ -31,28 +31,25 @@
 
   <div class="profile__tabs">
     <a href="{{ route('profile.show', ['tab' => 'listed'], false) }}"
-       class="tab {{ $tab === 'listed' ? 'is-active' : '' }}">出品した商品</a>
+      class="tab {{ $tab === 'listed' ? 'is-active' : '' }}">出品した商品</a>
     <a href="{{ route('profile.show', ['tab' => 'purchased'], false) }}"
-       class="tab {{ $tab === 'purchased' ? 'is-active' : '' }}">購入した商品</a>
+      class="tab {{ $tab === 'purchased' ? 'is-active' : '' }}">購入した商品</a>
   </div>
 
   <div class="items__grid">
     @if ($tab === 'listed')
-      @forelse ($listedItems as $item)
-        @include('partials.item-card', ['item' => $item])
-      @empty
-        <p class="profile__empty">…まだ出品がありません。</p>
-      @endforelse
+    @forelse ($listedItems as $item)
+    @include('partials.item-card', ['item' => $item])
+    @empty
+    <p class="profile__empty">…まだ出品がありません。</p>
+    @endforelse
     @else
-      @forelse ($purchasedItems as $item)
-        @include('partials.item-card', ['item' => $item])
-      @empty
-        <p class="profile__empty">…まだ購入履歴がありません。</p>
-      @endforelse
+    @forelse ($purchasedItems as $item)
+    @include('partials.item-card', ['item' => $item])
+    @empty
+    <p class="profile__empty">…まだ購入履歴がありません。</p>
+    @endforelse
     @endif
   </div>
 </div>
 @endsection
-
-
-

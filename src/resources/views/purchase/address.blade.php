@@ -72,9 +72,9 @@
 
     {{-- バリデーションエラーの全体表示 --}}
     @if ($errors->any())
-        <div class="hint" style="margin-bottom:16px;">
-            入力内容に誤りがあります。確認してください。
-        </div>
+    <div class="hint" style="margin-bottom:16px;">
+        入力内容に誤りがあります。確認してください。
+    </div>
     @endif
 
     <form method="post" action="{{ route('purchase.address.update', $item) }}">
@@ -89,7 +89,7 @@
                 value="{{ old('postal_code', $address->postal_code ?? '') }}"
                 placeholder="123-4567（ハイフン必須）">
             @error('postal_code')
-                <div class="hint">{{ $message }}</div>
+            <div class="hint">{{ $message }}</div>
             @enderror
         </div>
 
@@ -101,7 +101,7 @@
                 value="{{ old('address', $address->address ?? '') }}"
                 placeholder="都道府県 市区町村 番地">
             @error('address')
-                <div class="hint">{{ $message }}</div>
+            <div class="hint">{{ $message }}</div>
             @enderror
         </div>
 
@@ -113,7 +113,7 @@
                 value="{{ old('building', $address->building ?? '') }}"
                 placeholder="建物名・部屋番号など">
             @error('building')
-                <div class="hint">{{ $message }}</div>
+            <div class="hint">{{ $message }}</div>
             @enderror
         </div>
 

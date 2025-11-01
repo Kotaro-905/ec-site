@@ -164,7 +164,7 @@ class ItemController extends Controller
         $item = new Item();
         $item->user_id     = $request->user()->id;
         $item->name        = $v['name'];
-        $item->brand       = $v['brand'] ?? '';
+        $item->brand       = $v['brand'];
         $item->description = $v['description'];
         $item->price       = $v['price'];
         $item->condition   = $v['condition'];

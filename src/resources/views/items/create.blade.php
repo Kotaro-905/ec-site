@@ -65,7 +65,7 @@
             <div class="sell__row">
                 <label for="condition" class="sell__label">商品の状態</label>
                 <select id="condition" name="condition"
-                        class="sell__select {{ $errors->has('condition') ? 'is-invalid' : '' }}">
+                    class="sell__select {{ $errors->has('condition') ? 'is-invalid' : '' }}">
                     <option value="" hidden>選択してください</option>
                     @foreach($conditions as $key => $label)
                     <option value="{{ $key }}" @selected(old('condition')==$key)>{{ $label }}</option>
@@ -82,25 +82,25 @@
             <div class="sell__row">
                 <label class="sell__label" for="name">商品名</label>
                 <input type="text" id="name" name="name"
-                       value="{{ old('name') }}"
-                       class="sell__input {{ $errors->has('name') ? 'is-invalid' : '' }}"
-                       placeholder="商品名を入力">
+                    value="{{ old('name') }}"
+                    class="sell__input {{ $errors->has('name') ? 'is-invalid' : '' }}"
+                    placeholder="商品名を入力">
                 @error('name') <div class="hint">{{ $message }}</div> @enderror
             </div>
 
             <div class="sell__row">
                 <label class="sell__label" for="brand">ブランド名</label>
                 <input type="text" id="brand" name="brand"
-                       value="{{ old('brand') }}"
-                       class="sell__input"
-                       placeholder="ブランド名（任意）">
+                    value="{{ old('brand') }}"
+                    class="sell__input"
+                    placeholder="ブランド名（任意）">
             </div>
 
             <div class="sell__row">
                 <label class="sell__label" for="description">商品の説明</label>
                 <textarea id="description" name="description" rows="4"
-                          class="sell__textarea {{ $errors->has('description') ? 'is-invalid' : '' }}"
-                          placeholder="状態や付属品・サイズ感など">{{ old('description') }}</textarea>
+                    class="sell__textarea {{ $errors->has('description') ? 'is-invalid' : '' }}"
+                    placeholder="状態や付属品・サイズ感など">{{ old('description') }}</textarea>
                 @error('description') <div class="hint">{{ $message }}</div> @enderror
             </div>
 
@@ -109,9 +109,9 @@
                 <div class="sell__price">
                     <span>¥</span>
                     <input type="number" id="price" name="price"
-                           value="{{ old('price') }}"
-                           class="sell__input {{ $errors->has('price') ? 'is-invalid' : '' }}"
-                           min="1" step="1">
+                        value="{{ old('price') }}"
+                        class="sell__input {{ $errors->has('price') ? 'is-invalid' : '' }}"
+                        min="1" step="1">
                 </div>
                 @error('price') <div class="hint">{{ $message }}</div> @enderror
             </div>
@@ -142,7 +142,9 @@
 
     document.querySelectorAll('.chip').forEach(chip => {
         const checkbox = chip.querySelector('input[type="checkbox"]');
-        const update = () => { chip.classList.toggle('is-on', checkbox.checked); };
+        const update = () => {
+            chip.classList.toggle('is-on', checkbox.checked);
+        };
         update();
         checkbox.addEventListener('change', update);
     });

@@ -29,20 +29,20 @@
                 <nav class="header__nav">
                     <div class="header__links">
                         @auth
-                            <a class="header__link" href="{{ route('profile.show') }}">マイページ</a>
+                        <a class="header__link" href="{{ route('profile.show') }}">マイページ</a>
 
-                            <a class="header__link" href="{{ route('logout') }}"
-                               onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-                               ログアウト
-                            </a>
-                            <form id="logout-form" action="{{ route('logout') }}" method="post" style="display:none;">
-                                @csrf
-                            </form>
+                        <a class="header__link" href="{{ route('logout') }}"
+                            onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                            ログアウト
+                        </a>
+                        <form id="logout-form" action="{{ route('logout') }}" method="post" style="display:none;">
+                            @csrf
+                        </form>
                         @endauth
 
                         @guest
-                            <a class="header__link" href="{{ route('login') }}">ログイン</a>
-                            <a class="header__link" href="{{ route('profile.show') }}">マイページ</a>
+                        <a class="header__link" href="{{ route('login') }}">ログイン</a>
+                        <a class="header__link" href="{{ route('profile.show') }}">マイページ</a>
                         @endguest
                     </div>
 

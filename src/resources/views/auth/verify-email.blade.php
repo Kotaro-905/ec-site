@@ -4,44 +4,60 @@
 
 @section('css')
 <style>
-  .verify-card {
-      max-width: 520px;
-      margin: 4rem auto;
-      background: #fff;
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-      padding: 2rem 2.5rem;
-      text-align: center;
-  }
-  .verify-card h1 {
-      font-size: 1.5rem;
-      font-weight: bold;
-      color: #222;
-      margin-bottom: 1rem;
-  }
-  .verify-card p {
-      color: #333;
-      line-height: 1.6;
-      text-align: left;
-  }
-  .verify-card ol {
-      text-align: left;
-      color: #333;
-      margin: 1rem 0;
-      padding-left: 1.2rem;
-  }
-  .verify-btn {
-      display: block;
-      width: 100%;
-      padding: 0.9rem;
-      border-radius: 6px;
-      font-weight: bold;
-      margin-top: 1rem;
-      text-decoration: none;
-  }
-  .verify-btn.green { background: #22c55e; color: #fff; }
-  .verify-btn.gray  { background: #e5e7eb; color: #111827; }
-  .verify-btn.blue  { background: #c7d2fe; color: #1e3a8a; }
+    .verify-card {
+        max-width: 520px;
+        margin: 4rem auto;
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        padding: 2rem 2.5rem;
+        text-align: center;
+    }
+
+    .verify-card h1 {
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: #222;
+        margin-bottom: 1rem;
+    }
+
+    .verify-card p {
+        color: #333;
+        line-height: 1.6;
+        text-align: left;
+    }
+
+    .verify-card ol {
+        text-align: left;
+        color: #333;
+        margin: 1rem 0;
+        padding-left: 1.2rem;
+    }
+
+    .verify-btn {
+        display: block;
+        width: 100%;
+        padding: 0.9rem;
+        border-radius: 6px;
+        font-weight: bold;
+        margin-top: 1rem;
+        text-decoration: none;
+    }
+
+    .verify-btn.green {
+        background: #22c55e;
+        color: #fff;
+    }
+
+    .verify-btn.gray {
+        background: #e5e7eb;
+        color: #111827;
+    }
+
+    .verify-btn.blue {
+        background: #c7d2fe;
+        color: #1e3a8a;
+    }
 </style>
 @endsection
 
