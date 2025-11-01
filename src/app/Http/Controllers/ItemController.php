@@ -17,7 +17,14 @@ class ItemController extends Controller
      */
     public function index(Request $request)
     {
-        $tab = $request->input('tab', 'recommend');
+        if ($request->query('tab') === 'recommend') {
+            // q があれば維持して / に正規化
+            return redirect()->route('items.index', array_filter([
+                'q' => $request->query('q'),
+            ]));
+        }
+
+        $tab = $request->query('tab', 'recommend');
         $q   = trim((string) $request->input('q', ''));
 
         // ベースクエリ
@@ -170,7 +177,7 @@ class ItemController extends Controller
         $item->condition   = $v['condition'];
 
         // 主カテゴリ：選択された最初の1件を採用
-        $catIds            = collect($v['categories'])->map(fn ($id) => (int)$id)->unique()->values();
+        $catIds            = collect($v['categories'])->map(fn($id) => (int)$id)->unique()->values();
         $item->category_id = $catIds->first();
 
         $item->status = 1;

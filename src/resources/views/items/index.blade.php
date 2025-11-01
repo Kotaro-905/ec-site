@@ -11,18 +11,19 @@
 @php $q = request('q'); @endphp
 
 <div class="items__tabs">
-  <a href="{{ route('items.index', ['tab' => 'recommend'] + request()->only('q')) }}"
-    class="items__tab {{ $tab==='recommend' ? 'is-active' : '' }}">
+  {{-- おすすめ：常に /（q があれば q だけ付与） --}}
+  <a href="{{ route('items.index', request()->only('q')) }}"
+    class="items__tab {{ $tab === 'recommend' ? 'is-active' : '' }}">
     おすすめ
   </a>
 
   @auth
+  {{-- マイリスト：tab=mylist を付与 --}}
   <a href="{{ route('items.index', ['tab' => 'mylist'] + request()->only('q')) }}"
-    class="items__tab {{ $tab==='mylist' ? 'is-active' : '' }}">
+    class="items__tab {{ $tab === 'mylist' ? 'is-active' : '' }}">
     マイリスト
   </a>
   @endauth
-
 </div>
 
 <div class="items__grid">
