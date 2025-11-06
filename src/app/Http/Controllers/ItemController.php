@@ -48,17 +48,24 @@ class ItemController extends Controller
 
         // マイリスト（いいねした商品のみ）
         if ($tab === 'mylist' && auth()->check()) {
-            $likedItemIds = Like::where('user_id', auth()->id())
-                ->pluck('item_id')
-                ->all();
+        $userId = auth()->id();
 
-            // いいねが 0 件のときは空集合を返す
-            if (empty($likedItemIds)) {
-                $items->whereRaw('1 = 0');
-            } else {
-                $items->whereIn('items.id', $likedItemIds);
-            }
+        $likedItemIds = Like::where('user_id', $userId)
+            ->pluck('item_id')
+            ->all();
+
+        if (empty($likedItemIds)) {
+            // いいねが 0 件のときは空集合
+            $items->whereRaw('1 = 0');
+        } else {
+            $items->whereIn('items.id', $likedItemIds)
+                  ->where(function ($q2) use ($userId) {
+                      // user_id が NULL（旧データ想定） or 自分以外
+                      $q2->whereNull('items.user_id')
+                         ->orWhere('items.user_id', '<>', $userId);
+                  });
         }
+    }
 
         // 並び順 & ページネーション（q, tab を維持）
         $items = $items->latest('items.id')
